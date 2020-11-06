@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@metamask/logo": "^2.5.0",
     "cyberpunk-vue": "^0.4.1",
     "prettier": "^1.18.2",
     "vue": "^2.6.10",

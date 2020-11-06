@@ -46,7 +46,7 @@ npm run serve
 
 Compile Dapp: `cd vapp && npm run build`
 
-> Built into `./docs` served by GH Pages](https://erc.money)
+> Built into `./docs` served by [GH Pages](https://erc.money)
 
 Deployments
 ----------

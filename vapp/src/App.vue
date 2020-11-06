@@ -5,27 +5,29 @@
 
     <!-- CONNECTED MAIN -->
     <c-layout v-if="isOnline">
-      <c-aside width="200">
+      <c-main>
         WALLET: {{ $store.state.wallet }}
-      </c-aside>
-      <c-main>Main</c-main>
+      </c-main>
     </c-layout>
 
     <!-- ERROR MAIN -->
     <c-layout v-else>
-      <vue-metamask 
+      <c-main>
+        <vue-metamask 
           userMessage="Blurp! Blurp! Blurp! Authorizing awesomeness..." 
           @onComplete="metamask"
-      >
-      </vue-metamask>
+        >
+        </vue-metamask>
 
-      <div v-if="error">
-        <h1>{{ error }}</h1>    
-      </div>
+        <div v-if="error" id="error-block">
+          <h1>{{ error }}</h1>
+          <div ref="metamask" id="fox"></div>
+        </div>
 
-      <div v-else>
-        <Loading/>
-      </div>
+        <div v-else>
+          <Loading/>
+        </div>
+      </c-main>
     </c-layout>
 
     <!-- FOOTER -->
@@ -36,6 +38,7 @@
 <script>
 import VueMetamask from 'vue-metamask'
 import { mapGetters, mapMutations } from 'vuex'
+import ModelViewer from '@metamask/logo'
 
 import Loading from './components/Loading.vue'
 
@@ -63,18 +66,15 @@ export default {
       this.reset();
 
       if (!metaMaskAddress) {
-        this.error = 'No account choosen in Metamask. Please select one.';
-        return;
+        return this.fail('No account choosen in Metamask. Please select one.');
       }
 
       if (!["1", "4", "5777"].includes(netID)) {
-        this.error = `Disallowed nework ID "${netID}", please connect to Mainnet or Rinkeby`;
-        return;
+        return this.fail(`Disallowed nework ID "${netID}", please connect to Mainnet or Rinkeby`);
       }
 
       if (!['MAINNET', 'RINKEBY'].includes(type)) {
-        this.error = message;
-        return;
+        return this.fail(message);
       }
 
       this.setup({ web3, network: netID, wallet: metaMaskAddress });
@@ -82,8 +82,7 @@ export default {
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length <= 0) {
           this.reset();
-          this.error = 'Please choose an account in Metamask';
-          return;
+          return this.fail('Please choose an account in Metamask');
         }
 
         this.setup({ wallet: accounts[0] });
@@ -100,6 +99,33 @@ export default {
     setup(...args) {
       this._setup(...args);
       this.isOnline = this.$store.getters.isOnline;
+    },
+
+    fail(msg) {
+      this.error = msg;
+      this.$nextTick(() => { // render error
+        this.fox();
+      });
+    },
+
+    fox() {
+      this.$refs.metamask.innerHTML = "";
+
+      // initializing and appending the MetaMask Logo to its Div
+      const metaMaskViewer = ModelViewer({
+        pxNotRatio: false,
+        width: 0.5,
+        height: 0.5,
+        followMouse: true,
+        slowDrift: false,
+      });
+
+      this.$refs.metamask.appendChild(metaMaskViewer.container);
+
+      metaMaskViewer.lookAt({
+        x: 100,
+        y: 100,
+      });
     },
 
     ...mapMutations({ _reset: 'reset', _setup: 'setup' }),
@@ -128,29 +154,28 @@ body {
   padding: 0;
 }
 
-header,
+#error-block {
+  width: 100%;
+  text-align: center;
+  color: red;
+}
+
+#fox {
+  margin: 50px;
+}
+
 footer,
-main,
-aside {
-  font-size: 16px;
-  font-weight: bold;
-  color: #2E2E32;
-}
 header,
-footer {
-  background-color: #99a9bf;
-  line-height: 50px;
-  text-align: center;
-}
-
 main,
 aside {
-  background-color: #d3dce6;
-  line-height: 70px;
-  text-align: center;
+  padding: 10px;
 }
 
-aside {
-  background-color: #80889c;
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
 }
 </style>
