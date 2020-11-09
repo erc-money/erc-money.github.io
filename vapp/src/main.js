@@ -1,18 +1,26 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Jazzicon from 'vue-jazzicon'
 import cyberpunk from 'cyberpunk-vue'
+import { Message } from 'cyberpunk-vue'
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
+import 'augmented-ui/augmented-ui.min.css'
 
 import App from './App.vue'
 
+Vue.component(Jazzicon.name, Jazzicon)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
+
+Message.install(Vue) // o_O oh that chinese guys...
 
 const store = new Vuex.Store({
   state: {},
   getters: {
     isTestnet: state => state.network != "1",
     isOnline: state => !!(state.web3 && state.wallet && state.network),
+    web3: state => state.web3,
+    wallet: state => state.wallet,
   },
   mutations: {
     reset(state) {

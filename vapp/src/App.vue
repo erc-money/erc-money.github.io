@@ -1,12 +1,33 @@
 <template>
   <c-layout>
     <!-- HEADER -->
-    <c-header height="50">Header</c-header>
+    <c-header height="50">
+      <Header/>
+    </c-header>
 
     <!-- CONNECTED MAIN -->
-    <c-layout v-if="isOnline">
+    <c-layout id="main-container" v-if="isOnline">
       <c-main>
-        WALLET: {{ $store.state.wallet }}
+        <c-row class="grid" gutter="10">
+          <c-col
+            xs="12"
+            sm="12"
+            md="8"
+            lg="8"
+            xl="8"
+            xxl="8">
+            <Wallet/>
+          </c-col>
+          <c-col
+            xs="12"
+            sm="12"
+            md="16"
+            lg="16"
+            xl="16"
+            xxl="16">
+            <Main/>
+          </c-col>
+        </c-row>
       </c-main>
     </c-layout>
 
@@ -14,7 +35,7 @@
     <c-layout v-else>
       <c-main>
         <vue-metamask 
-          userMessage="Blurp! Blurp! Blurp! Authorizing awesomeness..." 
+          userMessage="Blurp! Blurp! Blurp! Something bad happened, please try again later..." 
           @onComplete="metamask"
         >
         </vue-metamask>
@@ -31,22 +52,33 @@
     </c-layout>
 
     <!-- FOOTER -->
-    <c-footer height="50">Footer</c-footer>
+    <c-footer height="30">
+      <Footer/>
+    </c-footer>
   </c-layout>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import VueMetamask from 'vue-metamask'
-import { mapGetters, mapMutations } from 'vuex'
 import ModelViewer from '@metamask/logo'
 
 import Loading from './components/Loading.vue'
+import Main from './components/Main.vue'
+import Wallet from './components/Wallet.vue'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 
 export default {
   name: 'app',
+
   components: {
-    Loading,
     VueMetamask,
+    Loading,
+    Wallet,
+    Header,
+    Footer,
+    Main,
   },
 
   data: function() {
@@ -54,10 +86,6 @@ export default {
       error: null,
       isOnline: false,
     }
-  },
-
-  computed: {
-    ...mapGetters(['isTestnet']),
   },
 
   methods: {
@@ -141,9 +169,28 @@ body {
   overflow: hidden;
   background-image: url('./assets/images/background.png');
   font-family: Audiowide;
-  color: #FCDA06;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+}
+
+.color-hl {
+  color: #FCDA06;
+}
+
+.color-main {
+  color: #5D354D;
+}
+
+.color-hl-bg {
+  background-color: #FCDA06;
+}
+
+.color-main-bg {
+  background-color: #5D354D;
 }
 
 #app {
@@ -164,6 +211,10 @@ body {
   margin: 50px;
 }
 
+#main-container {
+  margin-top: 20px;
+}
+
 footer,
 header,
 main,
@@ -177,5 +228,23 @@ footer {
   bottom: 0;
   width: 100%;
   text-align: center;
+}
+
+.c-button {
+  padding-top: 0.5em !important;
+  font-family: Audiowide;
+}
+
+.c-button-icon {
+  color: #5D354D;
+}
+
+.c-button-icon {
+  color: #5D354D;
+}
+
+.c-button-content {
+  color: #5D354D;
+  font-family: Audiowide;
 }
 </style>
