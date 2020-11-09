@@ -8,9 +8,12 @@
 </template>
 
 <script>
+import mixins from '../mixins'
+
 import Box from './generic/Box.vue'
 
 export default {
+  mixins,
   name: "Main",
 
   components: {

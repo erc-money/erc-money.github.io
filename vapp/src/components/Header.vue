@@ -25,7 +25,10 @@
 </template>
 
 <script>
+import mixins from '../mixins'
+
 export default {
+  mixins,
   name: "Header",
 };
 </script>

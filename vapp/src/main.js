@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import Jazzicon from 'vue-jazzicon'
 import cyberpunk from 'cyberpunk-vue'
 import { Message } from 'cyberpunk-vue'
+import VueClipboard from 'vue-clipboard2'
+
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
 import 'augmented-ui/augmented-ui.min.css'
 
@@ -11,7 +13,7 @@ import App from './App.vue'
 Vue.component(Jazzicon.name, Jazzicon)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
-
+Vue.use(VueClipboard)
 Message.install(Vue) // o_O oh that chinese guys...
 
 const store = new Vuex.Store({
@@ -20,7 +22,9 @@ const store = new Vuex.Store({
     isTestnet: state => state.network != "1",
     isOnline: state => !!(state.web3 && state.wallet && state.network),
     web3: state => state.web3,
+    network: state => state.network,
     wallet: state => state.wallet,
+    walletShort: state => `${state.wallet.substr(0, 10)}...${state.wallet.substr(-10)}`,
   },
   mutations: {
     reset(state) {
