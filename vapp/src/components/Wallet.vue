@@ -14,6 +14,23 @@
             </a>
           </c-col>
         </c-row>
+
+        <c-table
+          stripe
+          :bordered="false"
+          :selectedItems="false"
+          :dataSource="holdings"
+        >
+          <c-table-column field="asset"></c-table-column>
+          <c-table-column field="amount"></c-table-column>
+          <c-table-column field="actions">
+            <template>
+              <a :href="etherscanAccountLink()" target="_blank">
+                <c-button icon="link" v-on:click="nothing()">Etherscan</c-button>
+              </a>
+            </template>
+          </c-table-column>
+        </c-table>
       </div>
     </template>
   </Box>
@@ -27,6 +44,15 @@ import Box from './generic/Box.vue'
 export default {
   mixins,
   name: "Wallet",
+
+  computed: {
+    holdings() {
+      return [{
+        asset: 'ETH',
+        amount: this.humanValue(this.blockchain.wallet.balance),
+      }];
+    },
+  },
 
   components: {
     Box,
@@ -55,5 +81,14 @@ export default {
 
 .eth-address:hover {
   color: #5D354D;
+}
+
+#wallet > .c-table-wrapper {
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+#wallet > .c-table-wrapper > .c-table > thead {
+  display: none;
 }
 </style>

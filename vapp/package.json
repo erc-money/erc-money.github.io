@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest ../docs",
-    "lint": "vue-cli-service lint"
+    "serve": "npx vue-cli-service serve",
+    "build": "npx vue-cli-service build --dest ../docs",
+    "lint": "npx vue-cli-service lint",
+    "preinstall": "npx npm-force-resolutions"
   },
   "dependencies": {
+    "@metamask/controllers": "^4.0.2",
     "@metamask/etherscan-link": "^1.2.0",
     "@metamask/logo": "^2.5.0",
+    "@truffle/contract": "^4.2.29",
     "augmented-ui": "^2.0.0",
+    "ccunits": "^1.0.6",
     "cyberpunk-vue": "^0.4.1",
     "prettier": "^1.18.2",
     "vue": "^2.6.10",

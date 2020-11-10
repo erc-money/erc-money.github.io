@@ -7,7 +7,7 @@ Prerequisites
 --------
 
   - [ ] Truffle v5.1.49
-  - [ ] Node v12.x.x
+  - [ ] Node v10.x.x *(Limitation due to `scrypt` deprecated module)*
   - [ ] [Ganache](https://www.trufflesuite.com/ganache)
 
 Usage

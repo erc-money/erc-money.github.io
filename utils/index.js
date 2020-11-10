@@ -2,8 +2,9 @@ const pify = require('pify');
 const DEFAULT_PARAMS = require('../parameters.json');
 
 const AVG_BLOCK_TIME = 13.3;
+const DEFAULT_REWARD = '0.1 ether';
 const BLOCK_MATH_PARAMS = [/* e.g. "_startBlock" */];
-const HUMAN_VALUE_PARAMS = [/* e.g. "_rate" */];
+const HUMAN_VALUE_PARAMS = [ "_reward" ];
 
 const presaleParams = async (web3, params = {}, network = null) => {
   let accounts = [];
@@ -22,6 +23,7 @@ const presaleParams = async (web3, params = {}, network = null) => {
   const result = Object.assign({
     "_owner": accounts[0],
     "_treasury": accounts[1],
+    "_reward": DEFAULT_REWARD,
   }, params);
 
   for (const bmp of BLOCK_MATH_PARAMS) {

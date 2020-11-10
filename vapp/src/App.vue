@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 import VueMetamask from 'vue-metamask'
 import ModelViewer from '@metamask/logo'
 
@@ -156,7 +156,7 @@ export default {
       });
     },
 
-    ...mapMutations({ _reset: 'reset', _setup: 'setup' }),
+    ...mapActions({ _reset: 'reset', _setup: 'setup' }),
   },
 }
 </script>

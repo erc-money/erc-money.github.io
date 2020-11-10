@@ -4,7 +4,7 @@ export default {
   computed: {
     ...mapGetters([
       'isTestnet', 'isOnline', 'walletShort',
-      'wallet', 'web3', 'network',
+      'wallet', 'web3', 'network', 'blockchain',
     ]),
   },
 }

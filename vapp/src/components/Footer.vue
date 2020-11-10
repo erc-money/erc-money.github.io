@@ -21,7 +21,6 @@ export default {
   name: "Footer",
 
   methods: {
-    nothing() {},
     donate() {
       if (this.isOnline) {
         this.web3.eth.sendTransaction({
