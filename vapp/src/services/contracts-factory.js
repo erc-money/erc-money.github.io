@@ -12,6 +12,7 @@ export default (web3) => {
   const contracts = {};
 
   for (const name of CONTRACTS) {
+    //contracts[name] = { deployed() { return { address: null }; } }
     contracts[name] = contract(ABIS[name]);
     contracts[name].setProvider(web3.currentProvider);
   }

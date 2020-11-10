@@ -5,6 +5,7 @@ import {
   AssetsContractController,
   AssetsController,
   TokenBalancesController,
+  NetworkController,
   util
 } from '@metamask/controllers'
 import { POOL_INTERVAL, IPFS_GATEWAY, WATCH_TOKENS } from '../constants'
@@ -24,6 +25,7 @@ export default class Blockchain {
       new AssetsContractController(),
       new AssetsController(),
       new TokenBalancesController(),
+      new NetworkController(),
     ], {
       PreferencesController: {
         featureFlags: {}, // { [feature: string]: boolean }
@@ -51,6 +53,7 @@ export default class Blockchain {
       TokenBalancesController: {
         contractBalances: [], // { [address: string]: typeof BN }
       },
+      NetworkController: {},
     });
     this.datamodel.subscribe(this._listener.bind(this));
 
@@ -65,6 +68,7 @@ export default class Blockchain {
         clearTimeout(this.datamodel.context.AccountTrackerController.handle);
       }
       this.listener = null;
+      this.contracts = {};
     }
 
     return this.initialize();
@@ -78,44 +82,33 @@ export default class Blockchain {
     this.listener = listener;
     this.contracts = contractsFactory(web3);
 
-    tokens.push(...(await Promise.all(WATCH_TOKENS.map(async token => {
-      const tokenContract = await this.contracts[token].deployed();
+    await this._augmentTokens(tokens); // add internal tokens
 
-      if (!tokenContract.address) {
-        return false;
-      }
+    this._configureController('AccountTrackerController', {
+      interval,
+      provider: web3.currentProvider,
+    });
 
-      const [ decimals, symbol ] = await Promise.all([
-        tokenContract.decimals.call(),
-        tokenContract.symbol.call(),
-      ]);
+    this._configureController('AssetsContractController', {
+      provider: web3.currentProvider,
+    });
 
-      return {
-        address: tokenContract.address,
-        decimals, symbol,
-      };
-    }))).filter(Boolean));
+    this._configureController('AssetsController', {
+      selectedAddress: wallet,
+    });
 
-    this.datamodel.configure({
-      AccountTrackerController: {
-        interval, // number (miliseconds)
-        provider: web3.currentProvider, // doesn work :(
-      },
-      AssetsContractController: {
-        provider: web3.currentProvider, // doesn work :(
-      },
-      AssetsController: {
-        selectedAddress: wallet,
-      },
-      TokenBalancesController: {
-        interval,
-        tokens,
-      },
-    }, /* overwrite =*/ true, /* fullUpdate */ true);
-    
-    // o_O weird that it doesnt work...
-    this.datamodel.context.AccountTrackerController.provider = web3.currentProvider;
-    this.datamodel.context.AssetsContractController.provider = web3.currentProvider;
+    this._configureController('TokenBalancesController', {
+      interval,
+      tokens,
+    });
+
+    await Promise.all(tokens.map(token => {
+      return this.datamodel.context.AssetsController.addToken(
+        token.address,
+        token.symbol,
+        token.decimals,
+      );
+    }));
 
     return this.updateAccount(wallet);
   }
@@ -135,14 +128,45 @@ export default class Blockchain {
     return this;
   }
 
+  async _augmentTokens(tokens) {
+    tokens.push(...(await Promise.all(WATCH_TOKENS.map(async token => {
+      const tokenContract = await this.contracts[token].deployed();
+
+      if (!tokenContract.address || tokenContract.address == '0x0') {
+        return false;
+      }
+
+      const [ decimals, symbol ] = (await Promise.all([
+        tokenContract.decimals.call(),
+        tokenContract.symbol.call(),
+      ])).map(x => x.toString());
+
+      return {
+        address: tokenContract.address,
+        decimals, symbol,
+      };
+    }))).filter(Boolean));
+  }
+
+  _configureController(controller, config) {
+    this.datamodel.context[controller].configure(config, true, true);
+  }
+
   _listener() {
-    const state = { wallet: { balance: 0 }, ...this.flatState };
-    state.wallet = { balance: '0' };
+    const state = { wallet: { balance: '0', tokens: [] }, ...this.flatState };
+    const tokens = (state.allTokens[state.selectedAddress.toLowerCase()] || {}).undefined || [];
 
     if (state.accounts[state.selectedAddress]) {
       state.wallet.balance = util.hexToBN(
         state.accounts[state.selectedAddress].balance || '0x0'
       ).toString();
+    }
+    
+    for (const token of tokens) {
+      state.wallet.tokens.push({
+        ...token,
+        balance: (state.contractBalances[token.address] || 0).toString(),
+      });
     }
 
     // eslint-disable-next-line no-console
@@ -154,6 +178,9 @@ export default class Blockchain {
   }
 
   get flatState() {
-    return this.datamodel.flatState;
+    return {
+      ...this.contracts,
+      ...this.datamodel.flatState,
+    };
   }
 }

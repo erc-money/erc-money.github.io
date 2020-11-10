@@ -5,6 +5,8 @@ const AVG_BLOCK_TIME = 13.3;
 const DEFAULT_REWARD = '0.1 ether';
 const BLOCK_MATH_PARAMS = [/* e.g. "_startBlock" */];
 const HUMAN_VALUE_PARAMS = [ "_reward" ];
+// bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+const MINTER_ROLE = "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6";
 
 const presaleParams = async (web3, params = {}, network = null) => {
   let accounts = [];
@@ -114,6 +116,9 @@ const eth = (web3, amount) => {
 
 module.exports = (web3) => {
   return {
+    AVG_BLOCK_TIME,
+    DEFAULT_REWARD,
+    MINTER_ROLE,
     eth: (...args) => eth(web3, ...args),
     presaleParams: (...args) => presaleParams(web3, ...args),
     advanceTime: (...args) => advanceTime(web3, ...args),

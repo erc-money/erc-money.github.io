@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueRouter from 'vue-router'
 import Jazzicon from 'vue-jazzicon'
 import cyberpunk from 'cyberpunk-vue'
 import { Message } from 'cyberpunk-vue'
@@ -13,11 +14,14 @@ import App from './App.vue'
 
 import defaultState from './default-state'
 import { SYNC_BLOCKCHAIN, RESET, SETUP } from './states'
+import Market from './components/Market.vue'
+import About from './components/About.vue'
 
-Vue.component(Jazzicon.name, Jazzicon)
+Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
 Vue.use(VueClipboard)
+Vue.component(Jazzicon.name, Jazzicon)
 Message.install(Vue) // o_O oh that chinese guys...
 
 const blockchain = new Blockchain();
@@ -66,9 +70,17 @@ const store = new Vuex.Store({
   },
 })
 
+const router = new VueRouter({
+  routes: [
+    { path: '/', name: 'market', component: Market },
+    { path: '/about', name: 'about', component: About },
+  ],
+})
+
 Vue.config.productionTip = false
 
 new Vue({
   store,
+  router,
   render: h => h(App)
 }).$mount('#app')

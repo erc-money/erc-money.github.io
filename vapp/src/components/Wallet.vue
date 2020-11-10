@@ -1,5 +1,5 @@
 <template>
-  <Box :width="'inherit'">
+  <Box :width="'inherit'" :noAnimate="true">
     <template v-slot:title>Wallet</template>
     <template v-slot:content>
       <div id="wallet">
@@ -21,12 +21,15 @@
           :selectedItems="false"
           :dataSource="holdings"
         >
-          <c-table-column field="asset"></c-table-column>
+          <c-table-column field="symbol"></c-table-column>
           <c-table-column field="amount"></c-table-column>
-          <c-table-column field="actions">
-            <template>
-              <a :href="etherscanAccountLink()" target="_blank">
-                <c-button icon="link" v-on:click="nothing()">Etherscan</c-button>
+          <c-table-column field="link">
+            <template slot-scope="props">
+              <a :href="props.value" class="etherscan-text" target="_blank">
+                <c-button icon="link" size="small" v-on:click="nothing()">Etherscan</c-button>
+              </a>
+              <a :href="props.value" class="etherscan-icon" target="_blank">
+                <c-button icon="link" size="small" v-on:click="nothing()">E</c-button>
               </a>
             </template>
           </c-table-column>
@@ -47,10 +50,19 @@ export default {
 
   computed: {
     holdings() {
+      const tokens = (this.blockchain.wallet.tokens || []).map(token => {
+        return {
+          symbol: token.symbol,
+          amount: this.humanValue(token.balance, token.decimals),
+          link: this.etherscanTokenLink(token.address),
+        };
+      });
+
       return [{
-        asset: 'ETH',
+        symbol: 'ETH',
         amount: this.humanValue(this.blockchain.wallet.balance),
-      }];
+        link: this.etherscanAccountLink(this.wallet),
+      }, ...tokens];
     },
   },
 
@@ -66,7 +78,7 @@ export default {
       } catch(error) {
         this.notify(`Unable to copy address: ${error.message}`);
       }
-    }
+    },
   },
 };
 </script>
@@ -90,5 +102,22 @@ export default {
 
 #wallet > .c-table-wrapper > .c-table > thead {
   display: none;
+}
+
+.etherscan-icon,
+.etherscan-text {
+  display: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .etherscan-icon {
+    display: inline-block;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .etherscan-text {
+    display: inline-block;
+  }
 }
 </style>

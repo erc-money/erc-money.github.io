@@ -1,7 +1,7 @@
 <template>
   <div
-    class="cybox"
-    :style="'width:' + (width || '100%') + ';height:' + (height || 'auto')"
+    :class="'cybox' + (noAnimate ? '' : ' animated lightSpeedIn')"
+    :style="'width:' + (width || '100%') + ';height:' + (height || 'auto') + ';display:' + (hidden ? 'none' : 'block')"
   >
     <div class="cybox-wrapper" data-augmented-ui="exe tl-clip br-clip">
       <div class="cybox-title color-main color-hl-bg" data-augmented-ui="exe tl-clip br-clip">
@@ -19,6 +19,8 @@ export default {
   name: "cybox",
 
   props: {
+    noAnimate: Boolean, // don't animate (default: false)
+    hidden: Boolean, // hide the box (default: false)
     width: String, // default: 640px
     height: String // default: auto
   }
@@ -55,5 +57,76 @@ export default {
 
 .cybox > .cybox-wrapper  > .cybox-content {
   padding: 0.5em 1em;
+}
+
+/*base code*/
+.animated {
+  -webkit-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.animated.infinite {
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+.animated.hinge {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+}
+/*the animation definition*/
+@-webkit-keyframes lightSpeedIn {
+  0% {
+    -webkit-transform: translate3d(100%, 0, 0) skewX(-30deg);
+    transform: translate3d(100%, 0, 0) skewX(-30deg);
+    opacity: 0;
+  }
+  60% {
+    -webkit-transform: skewX(20deg);
+    transform: skewX(20deg);
+    opacity: 1;
+  }
+  80% {
+    -webkit-transform: skewX(-5deg);
+    transform: skewX(-5deg);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes lightSpeedIn {
+  0% {
+    -webkit-transform: translate3d(100%, 0, 0) skewX(-30deg);
+    -ms-transform: translate3d(100%, 0, 0) skewX(-30deg);
+    transform: translate3d(100%, 0, 0) skewX(-30deg);
+    opacity: 0;
+  }
+  60% {
+    -webkit-transform: skewX(20deg);
+    -ms-transform: skewX(20deg);
+    transform: skewX(20deg);
+    opacity: 1;
+  }
+  80% {
+    -webkit-transform: skewX(-5deg);
+    -ms-transform: skewX(-5deg);
+    transform: skewX(-5deg);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+.lightSpeedIn {
+  -webkit-animation-name: lightSpeedIn;
+  animation-name: lightSpeedIn;
+  -webkit-animation-timing-function: ease-out;
+  animation-timing-function: ease-out;
 }
 </style>

@@ -25,7 +25,7 @@
             lg="16"
             xl="16"
             xxl="16">
-            <Main/>
+            <router-view></router-view>
           </c-col>
         </c-row>
       </c-main>
@@ -64,7 +64,6 @@ import VueMetamask from 'vue-metamask'
 import ModelViewer from '@metamask/logo'
 
 import Loading from './components/Loading.vue'
-import Main from './components/Main.vue'
 import Wallet from './components/Wallet.vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
@@ -77,8 +76,7 @@ export default {
     Loading,
     Wallet,
     Header,
-    Footer,
-    Main,
+    Footer
   },
 
   data: function() {
@@ -166,7 +164,7 @@ export default {
 @import "./assets/styles/fonts.css";
 
 body {
-  overflow: hidden;
+  overflow-x: hidden;
   background-image: url('./assets/images/background.png');
   font-family: Audiowide;
   -webkit-font-smoothing: antialiased;
@@ -213,6 +211,11 @@ a {
 
 #main-container {
   margin-top: 20px;
+  margin-bottom: 50px;
+}
+
+footer {
+  background-color:rgba(93, 53, 77, 0.7);
 }
 
 footer,

@@ -6,30 +6,28 @@ const TokenA = artifacts.require("TokenA");
 const TokenB = artifacts.require("TokenB");
 
 module.exports = async function (deployer, network) {
-  const { presaleParams } = utilsFunctor(new Web3(deployer.provider));
+  const { presaleParams, MINTER_ROLE } = utilsFunctor(new Web3(deployer.provider));
   const params = await presaleParams(null, network);
 
   if (network != "mainnet") {
-    await Promise.all([
-      deployer.deploy(TokenA),
-      deployer.deploy(TokenB),
-    ]);
+    const tokenA = await deployer.deploy(TokenA);
+    const tokenB = await deployer.deploy(TokenB);
   }
 
-  const [ marketplace, token ] = await Promise.all([
-    await deployer.deploy(
-      Marketplace,
-      params._owner,
-      params._treasury
-    ),
-    await deployer.deploy(
-      EMToken,
-    ),
-  ]);
+  const token = await deployer.deploy(EMToken);
+  const marketplace = await deployer.deploy(
+    Marketplace,
+    params._owner,
+    params._treasury
+  );
 
-  // allow marketplace minting token
-  // bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-  await token.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6", marketplace.address)
+  await token.grantRole(MINTER_ROLE, marketplace.address);
+  await marketplace.updateReward(token.address, params._reward);
+
+  if (network != "mainnet") {
+    // premint 100 tokens
+    await token.mint(params._owner, '100000000000000000000');
+  }
   
-  return await marketplace.updateReward(token.address, params._reward);
+  return [ token, marketplace ];
 };

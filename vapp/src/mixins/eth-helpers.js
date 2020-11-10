@@ -4,6 +4,13 @@ import { WALLET_PRECISION } from '../constants'
 
 export default {
   methods: {
+    etherscanTokenLink(token, address = null, network = null) {
+      return etherscanLink.createAccountLink(
+        token,
+        network || this.network,
+      ) + `?a=${address || this.wallet}`;
+    },
+
     etherscanAccountLink(address = null, network = null) {
       return etherscanLink.createAccountLink(
         address || this.wallet,
@@ -18,7 +25,9 @@ export default {
     },
 
     humanValue(value, denominator = 18) {
-      return formatted(fromMinimal(value.toString(), denominator), WALLET_PRECISION);
+      const hvalueRaw = fromMinimal(value.toString(), denominator);
+      const hvalue = formatted(hvalueRaw, WALLET_PRECISION);    
+      return parseFloat(hvalue).toFixed(WALLET_PRECISION);
     },
   },
 }

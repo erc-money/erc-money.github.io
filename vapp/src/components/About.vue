@@ -1,6 +1,6 @@
 <template>
   <Box>
-    <template v-slot:title>Market</template>
+    <template v-slot:title>About</template>
     <template v-slot:content>
       ...
     </template>
@@ -14,7 +14,7 @@ import Box from './generic/Box.vue'
 
 export default {
   mixins,
-  name: "Main",
+  name: "About",
 
   components: {
     Box,
