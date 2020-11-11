@@ -14,27 +14,10 @@
 
 <script>
 import mixins from '../mixins'
-import { DONATE_WALLET, DONATE_AMOUNT } from '../constants'
 
 export default {
   mixins,
   name: "Footer",
-
-  methods: {
-    donate() {
-      if (this.isOnline) {
-        this.web3.eth.sendTransaction({
-          to: DONATE_WALLET,
-          from: this.wallet,
-          value: this.web3.toWei(DONATE_AMOUNT, 'ether'),
-        }, (error) => {
-          this.notify((error || {}).message || 'Thank you for the support!');
-        });
-      } else {
-        window.location = this.etherscanAccountLink(DONATE_WALLET, '1');
-      }
-    }
-  },
 };
 </script>
 

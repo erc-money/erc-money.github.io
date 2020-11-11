@@ -24,6 +24,10 @@
           <c-button icon="tradingdata" :class="[$route.name == 'market' && 'active-route']" @click="navigate(href)">Market</c-button>
         </router-link>
 
+        <router-link to="/stats" v-slot="{ href, navigate }">
+          <c-button icon="tradingvolume" :class="[$route.name == 'stats' && 'active-route']" @click="navigate(href)">Stats</c-button>
+        </router-link>
+
         <router-link to="/about" v-slot="{ href, navigate }">
           <c-button icon="help" :class="[$route.name == 'about' && 'active-route']" @click="navigate(href)">About</c-button>
         </router-link>

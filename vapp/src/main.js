@@ -16,6 +16,7 @@ import defaultState from './default-state'
 import { SYNC_BLOCKCHAIN, RESET, SETUP } from './states'
 import Market from './components/Market.vue'
 import About from './components/About.vue'
+import Stats from './components/Stats.vue'
 
 Vue.use(VueRouter)
 Vue.use(Vuex)
@@ -74,6 +75,7 @@ const router = new VueRouter({
   routes: [
     { path: '/', name: 'market', component: Market },
     { path: '/about', name: 'about', component: About },
+    { path: '/stats', name: 'stats', component: Stats }
   ],
 })
 

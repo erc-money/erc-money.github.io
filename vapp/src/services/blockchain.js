@@ -10,12 +10,16 @@ import {
 } from '@metamask/controllers'
 import { POOL_INTERVAL, IPFS_GATEWAY, WATCH_TOKENS } from '../constants'
 import contractsFactory from './contracts-factory'
+import marketplaceHandlers from './marketplace-handlers';
 
 export default class Blockchain {
   constructor() {
     this.listener = null;
     this.datamodel = null;
+    this.handle = null;
     this.contracts = {};
+    this.handlers = { ...marketplaceHandlers };
+    this.handlersState = {};
   }
 
   initialize() {
@@ -67,8 +71,14 @@ export default class Blockchain {
       if (this.datamodel.context.AccountTrackerController.handle) {
         clearTimeout(this.datamodel.context.AccountTrackerController.handle);
       }
+      if (this.handle) {
+        clearTimeout(this.handle);
+      }
+      this.handle = null;
       this.listener = null;
       this.contracts = {};
+      this.handlers = { ...marketplaceHandlers };
+      this.handlersState = {};
     }
 
     return this.initialize();
@@ -110,7 +120,10 @@ export default class Blockchain {
       );
     }));
 
-    return this.updateAccount(wallet);
+    await this.updateAccount(wallet);
+    await this._poll(interval);
+
+    return this;
   }
 
   async updateAccount(wallet, refresh = true) {
@@ -126,6 +139,36 @@ export default class Blockchain {
     }
 
     return this;
+  }
+
+  addHandler(stateKey, functor) {
+    this.handlers[stateKey] = functor;
+    return this;
+  }
+
+  removeHandler(stateKey) {
+    delete this.handlers[stateKey];
+    return this;
+  }
+
+  async _poll(interval) {
+    this.handle && clearTimeout(this.handle);
+    await util.safelyExecute(() => this._refresh());
+    this.handle = setTimeout(() => {
+      this._poll(interval);
+    }, interval);
+  }
+
+  async _refresh() {
+    const state = this.flatState;
+
+    for (const key of Object.keys(this.handlers)) {
+      await util.safelyExecute(async () => {
+        this.handlersState[key] = await this.handlers[key](state);
+      });
+    }
+
+    this._listener();
   }
 
   async _augmentTokens(tokens) {
@@ -153,7 +196,10 @@ export default class Blockchain {
   }
 
   _listener() {
-    const state = { wallet: { balance: '0', tokens: [] }, ...this.flatState };
+    const state = {
+      wallet: { balance: '0', tokens: [] },
+      ...this.flatState,
+    };
     const tokens = (state.allTokens[state.selectedAddress.toLowerCase()] || {}).undefined || [];
 
     if (state.accounts[state.selectedAddress]) {
@@ -180,6 +226,7 @@ export default class Blockchain {
   get flatState() {
     return {
       ...this.contracts,
+      ...this.handlersState,
       ...this.datamodel.flatState,
     };
   }

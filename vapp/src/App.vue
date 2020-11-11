@@ -6,10 +6,10 @@
     </c-header>
 
     <!-- CONNECTED MAIN -->
-    <c-layout id="main-container" v-if="isOnline">
+    <c-layout id="main-container" v-if="isOnline || $route.name == 'about'">
       <c-main>
         <c-row class="grid" gutter="10">
-          <c-col
+          <c-col v-if="isOnline"
             xs="12"
             sm="12"
             md="8"
@@ -19,12 +19,12 @@
             <Wallet/>
           </c-col>
           <c-col
-            xs="12"
-            sm="12"
-            md="16"
-            lg="16"
-            xl="16"
-            xxl="16">
+            :xs="isOnline ? 12 : 24"
+            :sm="isOnline ? 12 : 24"
+            :md="isOnline ? 16 : 24"
+            :lg="isOnline ? 16 : 24"
+            :xl="isOnline ? 16 : 24"
+            :xxl="isOnline ? 16 : 24">
             <router-view></router-view>
           </c-col>
         </c-row>

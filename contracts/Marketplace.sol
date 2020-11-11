@@ -23,15 +23,24 @@ contract Marketplace is Ownable, Pausable {
   IToken public token;
 
   // @dev amount tokens to reward for a closed order
-  uint reward;
+  uint public reward;
+
+  // @dev amount of distributed rewards
+  uint public rewardsCount;
+
+  // @dev value of distributed rewarrds
+  uint public rewardsValue;
 
   // @dev order if incrementer
-  uint lastOrderId;
+  uint public lastOrderId;
 
   // @dev orders book
   mapping (uint => IOrder.Order) orders;
 
   mapping (IOrder.Status => uint) ordersStats;
+
+  // @dev blacklisted tokens count
+  uint public blacklistedTokensCount;
 
   // @dev token addresses that are blacklisted
   mapping (IERC20 => bool) blacklistedTokens;
@@ -178,6 +187,7 @@ contract Marketplace is Ownable, Pausable {
       0 // completedAmount
     );
     orders[orderId] = order;
+    ordersStats[IOrder.Status.Open]++;
   }
 
   function closeOrder(uint orderId) public
@@ -186,6 +196,7 @@ contract Marketplace is Ownable, Pausable {
 
     IOrder.Status oldStatus = orders[orderId].status;
     orders[orderId].status = IOrder.Status.Closed;
+    ordersStats[IOrder.Status.Closed]++;
 
     emit OrderUpdated(orderId, oldStatus, IOrder.Status.Closed);
   }
@@ -214,6 +225,7 @@ contract Marketplace is Ownable, Pausable {
     orders[orderId].status = order.completedAmount == order.fromAmount
       ? IOrder.Status.Completed
       : IOrder.Status.PartiallyCompleted;
+    ordersStats[orders[orderId].status]++;
 
     // Interaction
     order.to.safeTransferFrom(_msgSender(), order.owner, payoffAmount);
@@ -244,8 +256,10 @@ contract Marketplace is Ownable, Pausable {
     blacklistedTokens[_token] = state;
 
     if (state) {
+      blacklistedTokensCount++;
       emit BlacklistedToken(_token, _msgSender());
     } else {
+      blacklistedTokensCount--;
       emit UnblacklistedToken(_token, _msgSender());
     }
   }
@@ -256,6 +270,8 @@ contract Marketplace is Ownable, Pausable {
   function _reward(address receiver) internal {
     if (reward > 0) {
       token.mint(receiver, reward);
+      rewardsCount++;
+      rewardsValue += reward;
       emit Reward(receiver, reward);
     }
   }
