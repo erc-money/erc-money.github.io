@@ -3,9 +3,11 @@
     <template v-slot:title>About</template>
     <template v-slot:content>
       <p>
-        <a href="http://erc.money">Erc.money</a> is an <span class="highlight">unregulated</span> and <span class="highlight">fee-less</span> exchange between ERC20 tokens holders <i>(ERC2 to ERC20)</i> with <span class="highlight">no liquidity needed</span>.
+        <a href="http://erc.money">Erc.money</a> is an <span class="highlight">unregulated</span> and <span class="highlight">fee-less</span>
+        platform that empowers the exchange between ERC20 tokens holders <i>(ERC2 to ERC20)</i>
+        with <span class="highlight">no liquidity needed</span>.
         <br/>
-        Simply <span class="highlight">exchange your tokens</span> and <span class="highlight">receive <b>iEMT</b> reward tokens</span> for completed orders.
+        Simply <span class="highlight">exchange your tokens</span>, have fun and <span class="highlight">receive <b>iEMT</b> reward tokens</span> for completed orders.
       </p>
       <p>
         Nowadays the crypto space is overpopulated with lots of CeFi and DeFi exchanges.

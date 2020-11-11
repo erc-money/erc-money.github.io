@@ -13,3 +13,4 @@ export const CONTRACTS = [
   LIVE_TOKEN,
   ...TEST_TOKENS,
 ];
+export const ORDERS_PAGE_SIZE = 100;

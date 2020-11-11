@@ -37,6 +37,9 @@ contract Marketplace is Ownable, Pausable {
   // @dev orders book
   mapping (uint => IOrder.Order) orders;
 
+  // @dev active orders of an user
+  mapping (address => uint[]) userActiveOrders;
+
   mapping (IOrder.Status => uint) ordersStats;
 
   // @dev blacklisted tokens count
@@ -141,6 +144,17 @@ contract Marketplace is Ownable, Pausable {
     return orders[orderId];
   }
 
+  function listUserOrders(address user) public view
+  returns (IOrder.Order[] memory userOrders){
+    uint count = userActiveOrders[user].length;
+    userOrders = new IOrder.Order[](count);
+
+    for (uint i = 0; i <= count; i++) {
+      uint orderId = userActiveOrders[user][i]; 
+      userOrders[i] = orders[orderId];
+    }
+  }
+
   function listOrders(uint orderId, uint offset, uint size) public view
   returns (IOrder.Order[] memory page, uint entries) {
     require(size <= 100, "Max page size is 100");
@@ -168,6 +182,9 @@ contract Marketplace is Ownable, Pausable {
   whenNotPaused isNotBlacklisted(from) isNotBlacklisted(to)
   returns (uint orderId) {
     require(fromAmount > 0 && toAmount > 0, "Amounts can not be 0");
+    require(address(from) != address(to), "Token can not be the same");
+    require(address(from) != address(0), "Token 'from' should exist");
+    require(address(to) != address(0), "Token 'to' should exist");
     require(
       from.allowance(_msgSender(), address(this)) >= fromAmount,
       "Marketplace not allowed to spend desired amount of tokens"
@@ -188,6 +205,7 @@ contract Marketplace is Ownable, Pausable {
     );
     orders[orderId] = order;
     ordersStats[IOrder.Status.Open]++;
+    userActiveOrders[_msgSender()].push(orderId);
   }
 
   function closeOrder(uint orderId) public
@@ -197,6 +215,7 @@ contract Marketplace is Ownable, Pausable {
     IOrder.Status oldStatus = orders[orderId].status;
     orders[orderId].status = IOrder.Status.Closed;
     ordersStats[IOrder.Status.Closed]++;
+    removeActiveOrder(_msgSender(), orderId);
 
     emit OrderUpdated(orderId, oldStatus, IOrder.Status.Closed);
   }
@@ -226,6 +245,10 @@ contract Marketplace is Ownable, Pausable {
       ? IOrder.Status.Completed
       : IOrder.Status.PartiallyCompleted;
     ordersStats[orders[orderId].status]++;
+
+    if (orders[orderId].status == IOrder.Status.Completed) {
+      removeActiveOrder(_msgSender(), orderId);
+    }
 
     // Interaction
     order.to.safeTransferFrom(_msgSender(), order.owner, payoffAmount);
@@ -262,6 +285,34 @@ contract Marketplace is Ownable, Pausable {
       blacklistedTokensCount--;
       emit UnblacklistedToken(_token, _msgSender());
     }
+  }
+
+  /**
+   * Removes an order from active user orders
+   */
+  function removeActiveOrder(address user, uint orderId) internal returns (uint index, bool found) {
+    if (userActiveOrders[user].length == 1 && userActiveOrders[user][0] == orderId) {
+      userActiveOrders[user].pop();
+      return (index, found);
+    }
+
+    for (uint i = 0; i <= userActiveOrders[user].length; i++){
+      if (userActiveOrders[user][i] == orderId) {
+        found = true;
+        index = i;
+        break;
+      }
+    }
+
+    if (!found) {
+      return (index, found);
+    }
+
+    for (uint i = index; i < userActiveOrders[user].length - 1; i++){
+      userActiveOrders[user][i] = userActiveOrders[user][i + 1];
+    }
+
+    userActiveOrders[user].pop();
   }
 
   /**
