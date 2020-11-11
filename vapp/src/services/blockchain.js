@@ -120,8 +120,8 @@ export default class Blockchain {
       );
     }));
 
-    await this.updateAccount(wallet);
-    await this._poll(interval);
+    this._poll(interval);
+    await this.updateAccount(wallet, true);
 
     return this;
   }
@@ -134,15 +134,25 @@ export default class Blockchain {
 
     // do not wait for the ticker...
     if (refresh) {
-      await util.safelyExecute(() => this.datamodel.context.AccountTrackerController.refresh());
-      await util.safelyExecute(() => this.datamodel.context.TokenBalancesController.updateBalances());
+      await this.refresh();
     }
 
     return this;
   }
 
-  addHandler(stateKey, functor) {
+  async refresh() {
+    await Promise.all([
+      util.safelyExecute(() => this.datamodel.context.AccountTrackerController.refresh()),
+      util.safelyExecute(() => this.datamodel.context.TokenBalancesController.updateBalances()),
+      util.safelyExecute(() => this._refresh()),
+    ]);
+
+    return this;
+  }
+
+  async addHandler(stateKey, functor) {
     this.handlers[stateKey] = functor;
+    await this._refresh();
     return this;
   }
 
@@ -151,22 +161,22 @@ export default class Blockchain {
     return this;
   }
 
-  async _poll(interval) {
+  _poll(interval) {
     this.handle && clearTimeout(this.handle);
-    await util.safelyExecute(() => this._refresh());
-    this.handle = setTimeout(() => {
+    this.handle = setTimeout(async () => {
+      await util.safelyExecute(() => this._refresh());
       this._poll(interval);
     }, interval);
   }
 
   async _refresh() {
-    const state = this.flatState;
+    const { flatState: state, web3, ethjsQuery } = this;
 
-    for (const key of Object.keys(this.handlers)) {
-      await util.safelyExecute(async () => {
-        this.handlersState[key] = await this.handlers[key](state);
+    await Promise.all(Object.keys(this.handlers).map(key => {
+      return util.safelyExecute(async () => {
+        this.handlersState[key] = await this.handlers[key]({ state, web3, ethjsQuery });
       });
-    }
+    }));
 
     this._listener();
   }
@@ -221,6 +231,14 @@ export default class Blockchain {
     if (typeof this.listener === 'function') {
       this.listener(state);
     }
+  }
+
+  get web3() {
+    return this.datamodel.context.AssetsContractController.web3;
+  }
+
+  get ethjsQuery() {
+    return this.datamodel.context.AccountTrackerController.ethjsQuery;
   }
 
   get flatState() {

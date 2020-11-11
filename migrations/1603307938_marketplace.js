@@ -16,18 +16,24 @@ module.exports = async function (deployer, network) {
     params._treasury
   );
 
+  console.info('Grant MINTER_ROLE to Marketplace');
   await token.grantRole(MINTER_ROLE, marketplace.address);
+
+  console.info('Setup Marketplace reward');
   await marketplace.updateReward(token.address, params._reward);
 
   if (network != "mainnet") {
     // deploy test tokens
+    console.info('Deploy test tokens');
     const tokenA = await deployer.deploy(TokenA);
     const tokenB = await deployer.deploy(TokenB);
 
-    tokenA.increaseAllowance(marketplace.address, '10000000000000000000'); // 10
-    tokenB.increaseAllowance(marketplace.address, '7000000000000000000'); // 7
+    console.info('Setup test orders Marketplace allowance');
+    await tokenA.increaseAllowance(marketplace.address, '10000000000000000000'); // 10
+    await tokenB.increaseAllowance(marketplace.address, '7000000000000000000'); // 7
 
     // add some test orders...
+    console.info('Create Order#1');
     await marketplace.createOrder(
       tokenA.address,
       '10000000000000000000', // 10
@@ -36,6 +42,7 @@ module.exports = async function (deployer, network) {
       true
     );
 
+    console.info('Create Order#2');
     await marketplace.createOrder(
       tokenB.address,
       '7000000000000000000', // 7
@@ -45,6 +52,7 @@ module.exports = async function (deployer, network) {
     );
     
     // premint 100 tokens
+    console.info('Mint 100 reward tokens to owner address');
     await token.mint(params._owner, '100000000000000000000');
   }
   

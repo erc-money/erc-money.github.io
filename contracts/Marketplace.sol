@@ -2,7 +2,6 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
@@ -12,7 +11,7 @@ import "./IToken.sol";
 
 contract Marketplace is Ownable, Pausable {
   using SafeMath for uint;
-  using SafeERC20 for IERC20;
+  using SafeERC20 for IToken;
 
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -46,7 +45,7 @@ contract Marketplace is Ownable, Pausable {
   uint public blacklistedTokensCount;
 
   // @dev token addresses that are blacklisted
-  mapping (IERC20 => bool) blacklistedTokens;
+  mapping (IToken => bool) blacklistedTokens;
 
   /**
    * @dev Emitted when the donation of `value` received from `account`.
@@ -56,17 +55,17 @@ contract Marketplace is Ownable, Pausable {
   /**
    * @dev Emitted when a `token` gets blacklisted by `who`.
    */
-  event BlacklistedToken(IERC20 token, address who);
+  event BlacklistedToken(IToken token, address who);
 
   /**
    * @dev Emitted when a `token` gets un-blacklisted by `who`.
    */
-  event UnblacklistedToken(IERC20 token, address who);
+  event UnblacklistedToken(IToken token, address who);
 
   /**
    * @dev Emitted when reward `token` and a `reward` amount apecified by `who`.
    */
-  event RewardUpdated(IERC20 token, uint reward, address who);
+  event RewardUpdated(IToken token, uint reward, address who);
 
   /**
    * @dev Emitted when `receiver` rewarded with `reward` amount of tokens.
@@ -86,7 +85,7 @@ contract Marketplace is Ownable, Pausable {
   /**
    * @dev check if `token` is not blacklisted
    */
-  modifier isNotBlacklisted(IERC20 _token) {
+  modifier isNotBlacklisted(IToken _token) {
     require(
       isTokenBlacklisted(_token) == false,
       "Token is blacklisted."
@@ -132,7 +131,19 @@ contract Marketplace is Ownable, Pausable {
     return orders[orderId].id > 0;
   }
 
-  function isTokenBlacklisted(IERC20 _token) public view returns (bool) {
+  function getOrder(uint orderId) public view returns (IOrder.Order memory order) {
+    order = orders[orderId];
+  }
+
+  function isOrderActive(uint orderId) public view returns (bool) {
+    IOrder.Status status = orders[orderId].status;
+
+    return orderExists(orderId)
+      && status != IOrder.Status.Completed
+      && status != IOrder.Status.Closed;
+  }
+
+  function isTokenBlacklisted(IToken _token) public view returns (bool) {
     return blacklistedTokens[_token];
   }
 
@@ -140,42 +151,54 @@ contract Marketplace is Ownable, Pausable {
     return ordersStats[status];
   }
 
-  function getOrder(uint orderId) public view returns (IOrder.Order memory) {
-    return orders[orderId];
-  }
-
-  function listUserOrders(address user) public view
+  function listActiveUserOrders(address user) public view
   returns (IOrder.Order[] memory userOrders){
     uint count = userActiveOrders[user].length;
     userOrders = new IOrder.Order[](count);
 
-    for (uint i = 0; i <= count; i++) {
+    for (uint i = 0; i < count; i++) {
       uint orderId = userActiveOrders[user][i]; 
       userOrders[i] = orders[orderId];
     }
   }
 
-  function listOrders(uint orderId, uint offset, uint size) public view
-  returns (IOrder.Order[] memory page, uint entries) {
+  function listOrders(uint offset, uint size, bool listOnlyActive) public view
+  returns (IOrder.Order[] memory page, uint newOffset, uint entries) {
     require(size <= 100, "Max page size is 100");
     page = new IOrder.Order[](size);
 
     for (uint i = 0; i < size; i++) {
-      uint y = offset + size;
+      uint y = offset + i;
 
       if (y >= lastOrderId) {
         break;
       }
 
-      entries++;
-      page[i] = getOrder(lastOrderId - y);
+      uint orderId = lastOrderId - y;
+
+      if (!listOnlyActive || isOrderActive(orderId)) {
+        entries++;
+        newOffset = orderId + 1;
+        page[i] = orders[orderId];
+      }
     }
   }
 
+  function orderPayoffAmount(uint orderId, uint amount) public view returns (uint payoffAmount) {
+    IOrder.Order storage order = orders[orderId];
+    require(
+      amount > 0 && amount <= (order.fromAmount - order.completedAmount),
+      "Amount is either 0 or greater than the one available"
+    );
+    require(order.allowPartial || amount == order.fromAmount, "Order does not allow partial buyout");
+
+    payoffAmount = order.toAmount * amount / (order.fromAmount * (10 ** 4));
+  }
+
   function createOrder(
-    IERC20 from,
+    IToken from,
     uint fromAmount,
-    IERC20 to,
+    IToken to,
     uint toAmount,
     bool allowPartial
   ) public
@@ -185,17 +208,23 @@ contract Marketplace is Ownable, Pausable {
     require(address(from) != address(to), "Token can not be the same");
     require(address(from) != address(0), "Token 'from' should exist");
     require(address(to) != address(0), "Token 'to' should exist");
+    require(bytes(from.symbol()).length > 0 && from.decimals() > 0, "From is not a valid ERC20 token");
+    require(bytes(to.symbol()).length > 0 && to.decimals() > 0, "To is not a valid ERC20 token");
     require(
       from.allowance(_msgSender(), address(this)) >= fromAmount,
       "Marketplace not allowed to spend desired amount of tokens"
     );
 
-    orderId = lastOrderId++;
-    IOrder.Order memory order = IOrder.Order(
+    orderId = ++lastOrderId;
+    orders[orderId] = IOrder.Order(
       from,
       fromAmount,
       to,
       toAmount,
+      from.symbol(),
+      from.decimals(),
+      to.symbol(),
+      to.decimals(),
       _msgSender(),
       allowPartial,
       orderId, // id
@@ -203,59 +232,45 @@ contract Marketplace is Ownable, Pausable {
       IOrder.Status.Open, // status
       0 // completedAmount
     );
-    orders[orderId] = order;
     ordersStats[IOrder.Status.Open]++;
     userActiveOrders[_msgSender()].push(orderId);
+
+    emit OrderCreated(orderId);
   }
 
   function closeOrder(uint orderId) public
-  orderReentrancyGuard(orderId) orderOpen(orderId) {
+  orderReentrancyGuard(orderId) orderOpen(orderId)
+  returns (bool) {
     require(orders[orderId].owner == _msgSender(), "Order updates allowed by orners only!");
 
-    IOrder.Status oldStatus = orders[orderId].status;
-    orders[orderId].status = IOrder.Status.Closed;
-    ordersStats[IOrder.Status.Closed]++;
-    removeActiveOrder(_msgSender(), orderId);
-
-    emit OrderUpdated(orderId, oldStatus, IOrder.Status.Closed);
+    _updateOrder(orders[orderId], IOrder.Status.Closed);
   }
 
   function claimOrder(uint orderId, uint amount, address wallet) public
   whenNotPaused orderReentrancyGuard(orderId) orderOpen(orderId)
   returns (bool) {
-    IOrder.Order memory order = orders[orderId];
-    IOrder.Status oldStatus = order.status;
+    IOrder.Order storage order = orders[orderId];
 
-    require(
-      amount > 0 && amount <= (order.fromAmount - order.completedAmount),
-      "Amount is either 0 or greater than the one available"
-    );
-    require(order.allowPartial || amount == order.fromAmount, "Order does not allow partial buyout");
+    // require(wallet != order.owner, "You can not buyback from yourself");
+    // require(_msgSender() != order.owner, "You can not trigger buyback from yourself");
 
-    uint payoffAmount = order.toAmount * order.fromAmount * amount / 10**4;
+    uint payoffAmount = orderPayoffAmount(orderId, amount);
+    IOrder.Status newStatus = order.completedAmount == order.fromAmount
+      ? IOrder.Status.Completed
+      : IOrder.Status.PartiallyCompleted;
 
     require(
       order.to.allowance(_msgSender(), address(this)) >= payoffAmount,
       "Marketplace not allowed to spend desired amount of tokens"
     );
 
-    // Effect
-    orders[orderId].completedAmount += amount;
-    orders[orderId].status = order.completedAmount == order.fromAmount
-      ? IOrder.Status.Completed
-      : IOrder.Status.PartiallyCompleted;
-    ordersStats[orders[orderId].status]++;
+    order.completedAmount += amount;
+    _updateOrder(order, newStatus);
 
-    if (orders[orderId].status == IOrder.Status.Completed) {
-      removeActiveOrder(_msgSender(), orderId);
-    }
-
-    // Interaction
     order.to.safeTransferFrom(_msgSender(), order.owner, payoffAmount);
     order.from.safeTransferFrom(order.owner, wallet, amount);
-
     _reward(wallet);
-    emit OrderUpdated(orderId, oldStatus, orders[orderId].status);
+
     return true;
   }
 
@@ -275,7 +290,7 @@ contract Marketplace is Ownable, Pausable {
   /**
    * @dev Blacklist a token
    */
-  function blacklistToken(IERC20 _token, bool state) public onlyOwner {
+  function blacklistToken(IToken _token, bool state) public onlyOwner {
     blacklistedTokens[_token] = state;
 
     if (state) {
@@ -287,10 +302,25 @@ contract Marketplace is Ownable, Pausable {
     }
   }
 
+  function _updateOrder(IOrder.Order storage order, IOrder.Status toStatus) internal {
+    IOrder.Status fromStatus = order.status;
+
+    order.status = toStatus;
+    ordersStats[fromStatus]--;
+    ordersStats[toStatus]++;
+
+    if (toStatus == IOrder.Status.Completed || toStatus == IOrder.Status.Closed) {
+      (,bool found) = _removeActiveOrder(_msgSender(), order.id);
+      require(found, "Order is not found as active. Should never happen!");
+    }
+
+    emit OrderUpdated(order.id, fromStatus, toStatus);
+  }
+
   /**
    * Removes an order from active user orders
    */
-  function removeActiveOrder(address user, uint orderId) internal returns (uint index, bool found) {
+  function _removeActiveOrder(address user, uint orderId) internal returns (uint index, bool found) {
     if (userActiveOrders[user].length == 1 && userActiveOrders[user][0] == orderId) {
       userActiveOrders[user].pop();
       return (index, found);

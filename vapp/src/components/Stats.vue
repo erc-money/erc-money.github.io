@@ -50,10 +50,10 @@
           </c-table>
         </c-col>
       </c-row>
-      <div class="blockquote">
+      <!-- <div class="blockquote">
         * A counter reflects all orders that passed through that state without being further decremented,
         which would mean that an order is reflected in several counters at once.
-      </div>
+      </div> -->
     </template>
   </Box>
 </template>
@@ -74,15 +74,15 @@ export default {
   computed: {
     stats() {
       return [{
-        reward: this.humanValue(this.$store.state.blockchain.reward),
-        rewardsCount: this.$store.state.blockchain.rewardsCount.toString(),
-        rewardsValue: this.humanValue(this.$store.state.blockchain.rewardsValue),
-        lastOrderId: this.$store.state.blockchain.lastOrderId.toString(),
-        blacklistedTokensCount: this.$store.state.blockchain.blacklistedTokensCount.toString(),
-        openedOrders: this.$store.state.blockchain.openedOrders.toString(),
-        partiallyCompletedOrders: this.$store.state.blockchain.partiallyCompletedOrders.toString(),
-        completedOrders: this.$store.state.blockchain.completedOrders.toString(),
-        closedOrders: this.$store.state.blockchain.closedOrders.toString(),
+        reward: this.humanValue(this.blockchain.reward),
+        rewardsCount: this.blockchain.rewardsCount.toString(),
+        rewardsValue: this.humanValue(this.blockchain.rewardsValue),
+        lastOrderId: this.blockchain.lastOrderId.toString(),
+        blacklistedTokensCount: this.blockchain.blacklistedTokensCount.toString(),
+        openedOrders: this.blockchain.openedOrders.toString(),
+        partiallyCompletedOrders: this.blockchain.partiallyCompletedOrders.toString(),
+        completedOrders: this.blockchain.completedOrders.toString(),
+        closedOrders: this.blockchain.closedOrders.toString(),
       }];
     },
   },

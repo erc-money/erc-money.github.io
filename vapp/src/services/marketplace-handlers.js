@@ -13,7 +13,7 @@ const MARKETPLACE_PROPS = {
 const handlers = {};
 
 for (const key of Object.keys(MARKETPLACE_PROPS)) {
-  handlers[key] = async state => {
+  handlers[key] = async ({ state }) => {
     const { contract, prop, args } = MARKETPLACE_PROPS[key];
     return (await state[contract].deployed())[prop || key].call(...(args || []));
   };

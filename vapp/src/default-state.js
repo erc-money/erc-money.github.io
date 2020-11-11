@@ -16,5 +16,7 @@ export default {
     partiallyCompletedOrders: 0,
     completedOrders: 0,
     closedOrders: 0,
+    orders: [],
+    personalOrders: [],
   },
 }

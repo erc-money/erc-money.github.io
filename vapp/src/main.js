@@ -13,10 +13,8 @@ import 'augmented-ui/augmented-ui.min.css'
 import App from './App.vue'
 
 import defaultState from './default-state'
-import { SYNC_BLOCKCHAIN, RESET, SETUP } from './states'
-import Market from './components/Market.vue'
-import About from './components/About.vue'
-import Stats from './components/Stats.vue'
+import { SYNC_BLOCKCHAIN, RESET, SETUP, SET_BLOCKCHAIN_GENERIC } from './states'
+import routes from './routes'
 
 Vue.use(VueRouter)
 Vue.use(Vuex)
@@ -26,6 +24,7 @@ Vue.component(Jazzicon.name, Jazzicon)
 Message.install(Vue) // o_O oh that chinese guys...
 
 const blockchain = new Blockchain();
+const router = new VueRouter({ routes });
 const store = new Vuex.Store({
   state: defaultState,
   getters: {
@@ -41,6 +40,17 @@ const store = new Vuex.Store({
     reset (store) {
       store.commit(RESET);
     },
+    updateBlockchain(store, { stateKey, value }) {
+      store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value });
+    },
+    addBlockchainHandler(store, { stateKey, functor, value = null }) {
+      blockchain.addHandler(stateKey, functor);
+      store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value });
+    },
+    removeBlockchainHandler(_store, { stateKey, functor }) {
+      blockchain.removeHandler(stateKey, functor);
+      store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value: undefined });
+    },
     setup (store, blockchainContext) {
       const { web3, wallet } = blockchainContext;
       store.commit(SETUP, blockchainContext);
@@ -55,8 +65,17 @@ const store = new Vuex.Store({
     },
   },
   mutations: {
+    [SET_BLOCKCHAIN_GENERIC]: (state, { stateKey, value }) => {
+      if (value === undefined) {
+        delete state.blockchain[stateKey];
+      } else {
+        state.blockchain[stateKey] = value;
+      }
+    },
     [SYNC_BLOCKCHAIN]: (state, blockchainFlatState) => {
-      state.blockchain = blockchainFlatState;
+      for (const key of Object.keys(blockchainFlatState)) {
+        state.blockchain[key] = blockchainFlatState[key];
+      }
     },
     [RESET]: (state) => {
       for (const key of Object.keys(defaultState)) {
@@ -69,14 +88,6 @@ const store = new Vuex.Store({
       state.wallet = wallet || state.wallet;
     },
   },
-})
-
-const router = new VueRouter({
-  routes: [
-    { path: '/', name: 'market', component: Market },
-    { path: '/about', name: 'about', component: About },
-    { path: '/stats', name: 'stats', component: Stats }
-  ],
 })
 
 Vue.config.productionTip = false
