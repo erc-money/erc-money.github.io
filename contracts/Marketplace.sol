@@ -192,7 +192,7 @@ contract Marketplace is Ownable, Pausable {
     );
     require(order.allowPartial || amount == order.fromAmount, "Order does not allow partial buyout");
 
-    payoffAmount = order.toAmount * amount / (order.fromAmount * (10 ** 4));
+    payoffAmount = amount * order.toAmount / order.fromAmount;
   }
 
   function createOrder(

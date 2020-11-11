@@ -20,7 +20,7 @@
               v-if="orders.length > 0 && current === null"
             >
               <c-table-column field="id" text="ID"></c-table-column>
-              <c-table-column field="from" text="Send">
+              <c-table-column field="from" text="Get">
                 <template slot-scope="props">
                   {{ props.value.amount }}
                   <a :href="props.value.link" target="_blank">
@@ -28,7 +28,7 @@
                   </a>
                 </template>
               </c-table-column>
-              <c-table-column field="to" text="Receive">
+              <c-table-column field="to" text="Spend">
                 <template slot-scope="props">
                   {{ props.value.amount }}
                   <a :href="props.value.link" target="_blank">
@@ -44,6 +44,7 @@
                   </a>
                 </template>
               </c-table-column>
+              <c-table-column field="partial" text="Partial"></c-table-column>
               <c-table-column field="_" text="Actions">
                 <template slot-scope="props">
                   <c-button icon="trust" v-on:click="setCurrent(props.value)">Exchange</c-button>
@@ -53,7 +54,7 @@
             <div v-else-if="current !== null">
               <c-row class="grid">
               <c-col span="8">
-                <c-input placeholder="Amount" v-model="currentHumanAmount"></c-input>
+                <c-input placeholder="Amount" :readonly="current.order.allowPartial == false" v-model="currentHumanAmount"></c-input>
               </c-col>
               <c-col span="16">
                 <c-input placeholder="Wallet" v-model="current.wallet"></c-input>
@@ -126,6 +127,7 @@
                   </a>
                 </template>
               </c-table-column>
+              <c-table-column field="partial" text="Partial"></c-table-column>
               <c-table-column field="_" text="Actions">
                 <template slot-scope="props">
                   <c-button icon="close" v-on:click="close(props.value.id)">Close</c-button>
@@ -229,10 +231,6 @@ export default {
     },
 
     setCurrent(order) {
-      if (this.exchanging) {
-        return;
-      }
-
       this.resetCurrent();
       this.current = {
         order,
@@ -246,7 +244,7 @@ export default {
     },
 
     async exchange() {
-      if (!this.current || this.exchanging) {
+      if (!this.current) {
         return;
       }
 
@@ -363,6 +361,7 @@ export default {
           from,
           to,
           remaining,
+          partial: order.allowPartial ? 'Yes' : 'No',
           _: order,
         });
       }
@@ -421,6 +420,7 @@ export default {
           from,
           to,
           remaining,
+          partial: order.allowPartial ? 'Yes' : 'No',
           _: {
             ...order,
             remaining: this.toBN(order.fromAmount).sub(this.toBN(order.completedAmount)),
