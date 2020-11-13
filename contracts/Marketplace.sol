@@ -251,25 +251,29 @@ contract Marketplace is Ownable, Pausable {
   returns (bool) {
     IOrder.Order storage order = orders[orderId];
 
-    // require(wallet != order.owner, "You can not buyback from yourself");
-    // require(_msgSender() != order.owner, "You can not trigger buyback from yourself");
+    require(wallet != order.owner, "You can not buyback from yourself");
+    require(_msgSender() != order.owner, "You can not trigger buyback from yourself");
 
     uint payoffAmount = orderPayoffAmount(orderId, amount);
-    IOrder.Status newStatus = order.completedAmount == order.fromAmount
-      ? IOrder.Status.Completed
-      : IOrder.Status.PartiallyCompleted;
-
+    
     require(
       order.to.allowance(_msgSender(), address(this)) >= payoffAmount,
       "Marketplace not allowed to spend desired amount of tokens"
     );
 
     order.completedAmount += amount;
+    IOrder.Status newStatus = order.completedAmount == order.fromAmount
+      ? IOrder.Status.Completed
+      : IOrder.Status.PartiallyCompleted;
+    
     _updateOrder(order, newStatus);
 
     order.to.safeTransferFrom(_msgSender(), order.owner, payoffAmount);
     order.from.safeTransferFrom(order.owner, wallet, amount);
-    _reward(wallet);
+    
+    // send rewards
+    _reward(order.owner);
+    _reward(_msgSender());
 
     return true;
   }
@@ -322,6 +326,8 @@ contract Marketplace is Ownable, Pausable {
    */
   function _removeActiveOrder(address user, uint orderId) internal returns (uint index, bool found) {
     if (userActiveOrders[user].length == 1 && userActiveOrders[user][0] == orderId) {
+      found = true;
+      index = 0;
       userActiveOrders[user].pop();
       return (index, found);
     }

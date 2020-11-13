@@ -5,8 +5,12 @@ const EMToken = artifacts.require("EMToken");
 const TokenA = artifacts.require("TokenA");
 const TokenB = artifacts.require("TokenB");
 
+const TEST_TOKENS_AMOUNT = '100000000000000000000'; // 100 tokens
+
 module.exports = async function (deployer, network) {
-  const { presaleParams, MINTER_ROLE } = utilsFunctor(new Web3(deployer.provider));
+  const web3 = new Web3(deployer.provider);
+  const { presaleParams, MINTER_ROLE } = utilsFunctor(web3);
+  const accounts = await web3.eth.getAccounts();
   const params = await presaleParams(null, network);
 
   const token = await deployer.deploy(EMToken);
@@ -28,32 +32,13 @@ module.exports = async function (deployer, network) {
     const tokenA = await deployer.deploy(TokenA);
     const tokenB = await deployer.deploy(TokenB);
 
-    console.info('Setup test orders Marketplace allowance');
-    await tokenA.increaseAllowance(marketplace.address, '10000000000000000000'); // 10
-    await tokenB.increaseAllowance(marketplace.address, '7000000000000000000'); // 7
+    console.info('Mint some test tokens to', accounts[0]);
+    await tokenA.mint(accounts[0], TEST_TOKENS_AMOUNT);
+    await tokenB.mint(accounts[0], TEST_TOKENS_AMOUNT);
 
-    // add some test orders...
-    console.info('Create Order#1');
-    await marketplace.createOrder(
-      tokenA.address,
-      '10000000000000000000', // 10
-      tokenB.address,
-      '6000000000000000000', // 6
-      true
-    );
-
-    console.info('Create Order#2');
-    await marketplace.createOrder(
-      tokenB.address,
-      '7000000000000000000', // 7
-      tokenA.address,
-      '5000000000000000000', // 5
-      false
-    );
-    
-    // premint 100 tokens
-    console.info('Mint 100 reward tokens to owner address');
-    await token.mint(params._owner, '100000000000000000000');
+    console.info('Mint some test tokens to', accounts[1]);
+    await tokenA.mint(accounts[1], TEST_TOKENS_AMOUNT);
+    await tokenB.mint(accounts[1], TEST_TOKENS_AMOUNT);
   }
   
   return [ token, marketplace ];

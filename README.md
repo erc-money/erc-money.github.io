@@ -20,6 +20,16 @@ Install dependencies: `npm install`
 Deploy contracts:
   - Deploy to Rinkeby: `INFURA_API_KEY=... PRIVATE_KEY=... npm run deploy:testnet`
   - Deploy to Mainnet: `INFURA_API_KEY=... PRIVATE_KEY=... npm run deploy`
+  - Development (`Ganache`): `npm run deploy:develop -- --reset`
+
+> Please start `Ganache` on port `8888` using Network ID `5777` on `All Interfaces (0.0.0.0)`<br/>
+> (RPC Url: `http://0.0.0.0:8888`).
+
+>  If you run WSL and your port are not forwarded, 
+>   run `Powershell.exe -executionpolicy bypass -File ./fix-wsl-network.ps1` in Powershell.
+
+> Also you can create alias for host IP in `~/.bashrc`:<br/>
+>  `export WSL_HOST_IP=$(ipconfig.exe | awk '/WSL/ {getline; getline; getline; getline; print substr($14, 1, length($14)-1)}')`
 
 Verify contracts on Etherscan:
   - Verify on Rinkeby: `ETHERSCAN_API_KEY=... npm run verify:testnet`
@@ -32,11 +42,7 @@ Generate Coverage Report: `npm run coverage`
 Run Dapp:
 
 ```bash
-# Assuming your Ganache is running
-# If you run WSL and your port are not forwarded, 
-#     run `Powershell.exe -executionpolicy bypass -File fix-wsl-network.ps1` in Powershell
-# Also you can create alias for host IP in ~/.bashrc
-#   export WSL_HOST_IP=$(ipconfig.exe | awk '/WSL/ {getline; getline; getline; getline; print substr($14, 1, length($14)-1)}')
+# Assuming your Ganache is running...
 npm run deploy:develop
 cd vapp
 npm run serve

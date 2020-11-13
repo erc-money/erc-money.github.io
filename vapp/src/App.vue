@@ -175,6 +175,10 @@ a {
   text-decoration: none;
 }
 
+hr {
+  border-top: 2px dashed  #5D354D;
+}
+
 .color-hl {
   color: #FCDA06;
 }

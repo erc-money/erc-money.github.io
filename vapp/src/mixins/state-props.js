@@ -5,6 +5,8 @@ export default {
     ...mapGetters([
       'isTestnet', 'isOnline', 'walletShort',
       'wallet', 'web3', 'network', 'blockchain',
+      // services
+      '$blockchain',
     ]),
   },
 }

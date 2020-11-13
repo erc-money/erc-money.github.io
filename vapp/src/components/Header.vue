@@ -18,7 +18,7 @@
         </c-col>
       </c-row>
     </c-col>
-    <c-col span="16" class="controls">
+    <c-col span="15" class="controls">
       <c-button-group>
         <router-link to="/" v-slot="{ href, navigate }">
           <c-button icon="tradingdata" :class="[$route.name == 'market' && 'active-route']" @click="navigate(href)">Market</c-button>
@@ -31,6 +31,12 @@
         <router-link to="/about" v-slot="{ href, navigate }">
           <c-button icon="help" :class="[$route.name == 'about' && 'active-route']" @click="navigate(href)">About</c-button>
         </router-link>
+      </c-button-group>
+
+      <c-button-group id="network" v-if="isOnline" :class="isTestnet ? 'testnet' : 'mainnet'">
+        <c-button :icon="isTestnet ? 'warning' : 'trust'" disabled>
+          {{ isTestnet ? 'TESTNET' : 'MAINNET' }}
+        </c-button>
       </c-button-group>
     </c-col>
   </c-row>
@@ -71,6 +77,80 @@ export default {
 #logo-text {
   font-weight: lighter;
   filter: drop-shadow(0 0 1px #F8DA00);
+}
+
+#network {
+  margin-left: 10px;
+}
+
+#network > button {
+  background: none;
+  cursor: default;
+}
+
+#network > button > span {
+  color: greenyellow;
+  font-weight: bolder;
+  margin-right: 5px;
+}
+
+#network > button > .c-button-icon {
+  font-size: 1.3em;
+  margin-top: -0.2em;
+}
+
+#network.testnet > button > .c-button-content {
+  transform: scale(1);
+	animation: pulse-red 2s infinite;
+  box-shadow: 0 0 0 0 rgba(255, 0, 0, 1);
+}
+
+#network.mainnet > button > .c-button-content {
+  transform: scale(1);
+	animation: pulse-green 2s infinite;
+  box-shadow: 0 0 0 0 rgba(173, 255, 47, 1);
+}
+
+@keyframes pulse-red {
+	0% {
+		/* transform: scale(0.95); */
+		box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+	}
+
+	70% {
+		/* transform: scale(1); */
+		box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+	}
+
+	100% {
+		/* transform: scale(0.95); */
+		box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+	}
+}
+
+@keyframes pulse-green {
+	0% {
+		/* transform: scale(0.95); */
+		box-shadow: 0 0 0 0 rgba(173, 255, 47, 0.7);
+	}
+
+	70% {
+		/* transform: scale(1); */
+		box-shadow: 0 0 0 10px rgba(173, 255, 47, 0);
+	}
+
+	100% {
+		/* transform: scale(0.95); */
+		box-shadow: 0 0 0 0 rgba(173, 255, 47, 0);
+	}
+}
+
+#network.testnet > button > .c-button-icon {
+  color: red;
+}
+
+#network.mainnet > button > .c-button-icon {
+  color: greenyellow;
 }
 
 .controls {

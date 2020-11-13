@@ -1,5 +1,9 @@
+import { LIVE_TOKEN } from '../constants'
+
 const MARKETPLACE_PROPS = {
   reward: { contract: 'Marketplace' },
+  rewardSymbol: { contract: LIVE_TOKEN, prop: 'symbol' },
+  rewardDecimals: { contract: LIVE_TOKEN, prop: 'decimals' },
   rewardsCount: { contract: 'Marketplace' },
   rewardsValue: { contract: 'Marketplace' },
   lastOrderId: { contract: 'Marketplace' },

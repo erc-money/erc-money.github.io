@@ -87,7 +87,7 @@ module.exports = {
       // In case of WSL setup
       // export WSL_HOST_IP=$(ipconfig.exe | awk '/WSL/ {getline; getline; getline; getline; print substr($14, 1, length($14)-1)}')
       host: process.env.WSL_HOST_IP || "127.0.0.1",
-      port: 7545,
+      port: 8888,
       network_id: "5777"
     },
     rinkeby: {

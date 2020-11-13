@@ -35,6 +35,7 @@ const store = new Vuex.Store({
     wallet: state => state.wallet,
     walletShort: state => `${state.wallet.substr(0, 10)}...${state.wallet.substr(-10)}`,
     blockchain: state => state.blockchain,
+    $blockchain: () => blockchain,
   },
   actions: {
     reset (store) {

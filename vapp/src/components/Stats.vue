@@ -74,7 +74,7 @@ export default {
   computed: {
     stats() {
       return [{
-        reward: this.humanValue(this.blockchain.reward),
+        reward: this.humanValue(this.blockchain.reward, this.blockchain.rewardDecimals),
         rewardsCount: this.blockchain.rewardsCount.toString(),
         rewardsValue: this.humanValue(this.blockchain.rewardsValue),
         lastOrderId: this.blockchain.lastOrderId.toString(),

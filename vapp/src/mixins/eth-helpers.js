@@ -4,6 +4,10 @@ import { WALLET_PRECISION/*, TX_POOL_INTERVAL, BLOCKS_CONFIRMATION*/ } from '../
 
 export default {
   methods: {
+    isAddress(address) {
+      return address && /^0x[a-zA-Z0-9]{40}$/.test(address);
+    },
+
     etherscanTokenLink(token, address = null, network = null) {
       return etherscanLink.createAccountLink(
         token,

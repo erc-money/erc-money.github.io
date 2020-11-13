@@ -18,6 +18,7 @@ export default class Blockchain {
     this.datamodel = null;
     this.handle = null;
     this.contracts = {};
+    this.tokens = [];
     this.handlers = { ...marketplaceHandlers };
     this.handlersState = {};
   }
@@ -77,6 +78,7 @@ export default class Blockchain {
       this.handle = null;
       this.listener = null;
       this.contracts = {};
+      this.tokens = [];
       this.handlers = { ...marketplaceHandlers };
       this.handlersState = {};
     }
@@ -91,8 +93,7 @@ export default class Blockchain {
   async configure({ web3, wallet, tokens = [], interval = POOL_INTERVAL }, listener) {
     this.listener = listener;
     this.contracts = contractsFactory(web3);
-
-    await this._augmentTokens(tokens); // add internal tokens
+    this.tokens = await this._augmentTokens(tokens);
 
     this._configureController('AccountTrackerController', {
       interval,
@@ -109,17 +110,10 @@ export default class Blockchain {
 
     this._configureController('TokenBalancesController', {
       interval,
-      tokens,
+      tokens: this.tokens,
     });
 
-    await Promise.all(tokens.map(token => {
-      return this.datamodel.context.AssetsController.addToken(
-        token.address,
-        token.symbol,
-        token.decimals,
-      );
-    }));
-
+    await this._configureTokens();
     this._poll(interval);
     await this.updateAccount(wallet, true);
 
@@ -131,6 +125,12 @@ export default class Blockchain {
     this.datamodel.context.PreferencesController.updateIdentities([ wallet ]);
     // set wallet address
     this.datamodel.context.PreferencesController.setSelectedAddress(wallet);
+    // specify same wallet for assets
+    this._configureController('AssetsController', {
+      selectedAddress: wallet,
+    });
+    // configure existing tokens for the account
+    await this._configureTokens();
 
     // do not wait for the ticker...
     if (refresh) {
@@ -161,24 +161,14 @@ export default class Blockchain {
     return this;
   }
 
-  _poll(interval) {
-    this.handle && clearTimeout(this.handle);
-    this.handle = setTimeout(async () => {
-      await util.safelyExecute(() => this._refresh());
-      this._poll(interval);
-    }, interval);
-  }
-
-  async _refresh() {
-    const { flatState: state, web3, ethjsQuery } = this;
-
-    await Promise.all(Object.keys(this.handlers).map(key => {
-      return util.safelyExecute(async () => {
-        this.handlersState[key] = await this.handlers[key]({ state, web3, ethjsQuery });
-      });
+  async _configureTokens() {
+    await Promise.all(this.tokens.map(token => {
+      return this.datamodel.context.AssetsController.addToken(
+        token.address,
+        token.symbol,
+        token.decimals,
+      );
     }));
-
-    this._listener();
   }
 
   async _augmentTokens(tokens) {
@@ -198,7 +188,29 @@ export default class Blockchain {
         address: tokenContract.address,
         decimals, symbol,
       };
-    }))).filter(Boolean));
+    }))));
+    
+    return tokens.filter(Boolean);
+  }
+
+  _poll(interval) {
+    this.handle && clearTimeout(this.handle);
+    this.handle = setTimeout(async () => {
+      await util.safelyExecute(() => this._refresh());
+      this._poll(interval);
+    }, interval);
+  }
+
+  async _refresh() {
+    const { flatState: state, web3, ethjsQuery } = this;
+
+    await Promise.all(Object.keys(this.handlers).map(key => {
+      return util.safelyExecute(async () => {
+        this.handlersState[key] = await this.handlers[key]({ state, web3, ethjsQuery });
+      });
+    }));
+
+    this._listener();
   }
 
   _configureController(controller, config) {
