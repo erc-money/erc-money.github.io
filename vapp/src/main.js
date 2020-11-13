@@ -61,7 +61,7 @@ const store = new Vuex.Store({
           store.commit(SYNC_BLOCKCHAIN, blockchainFlatState);
         });
       } else if (wallet) {
-        blockchain.updateAccount(wallet);
+        blockchain.updateAccount({ wallet });
       }
     },
   },

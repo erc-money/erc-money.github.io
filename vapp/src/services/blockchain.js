@@ -93,7 +93,6 @@ export default class Blockchain {
   async configure({ web3, wallet, tokens = [], interval = POOL_INTERVAL }, listener) {
     this.listener = listener;
     this.contracts = contractsFactory(web3);
-    this.tokens = await this._augmentTokens(tokens);
 
     this._configureController('AccountTrackerController', {
       interval,
@@ -103,34 +102,31 @@ export default class Blockchain {
     this._configureController('AssetsContractController', {
       provider: web3.currentProvider,
     });
+    
+    await this.updateAccount({ wallet, tokens, interval }, true);
+    this._poll(interval);
 
+    return this;
+  }
+
+  async updateAccount({ wallet, tokens = [], interval = POOL_INTERVAL }, refresh = true) {
+    this.tokens = await this._augmentTokens(tokens);
+
+    // add wallet to identities
+    this.datamodel.context.PreferencesController.updateIdentities([ wallet ]);
+    // set wallet address
+    this.datamodel.context.PreferencesController.setSelectedAddress(wallet);
+    
     this._configureController('AssetsController', {
       selectedAddress: wallet,
     });
+
+    await this._configureTokens();
 
     this._configureController('TokenBalancesController', {
       interval,
       tokens: this.tokens,
     });
-
-    await this._configureTokens();
-    this._poll(interval);
-    await this.updateAccount(wallet, true);
-
-    return this;
-  }
-
-  async updateAccount(wallet, refresh = true) {
-    // add wallet to identities
-    this.datamodel.context.PreferencesController.updateIdentities([ wallet ]);
-    // set wallet address
-    this.datamodel.context.PreferencesController.setSelectedAddress(wallet);
-    // specify same wallet for assets
-    this._configureController('AssetsController', {
-      selectedAddress: wallet,
-    });
-    // configure existing tokens for the account
-    await this._configureTokens();
 
     // do not wait for the ticker...
     if (refresh) {

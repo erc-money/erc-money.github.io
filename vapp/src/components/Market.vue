@@ -398,7 +398,7 @@ export default {
       this.resetCurrent();
       this.current = {
         order,
-        amount: order.fromAmount,
+        amount: order.remaining,
         wallet: this.wallet,
       };
     },
@@ -472,7 +472,6 @@ export default {
           //token.allowance.call(this.wallet, Marketplace.address),
         ]);
         const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals);
-
 
         //if (!this.toBN(allowance).gte(this.toBN(payoffAmount))) {
           await token.increaseAllowance(Marketplace.address, payoffAmount, { from: this.wallet });

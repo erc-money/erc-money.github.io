@@ -314,7 +314,7 @@ contract Marketplace is Ownable, Pausable {
     ordersStats[toStatus]++;
 
     if (toStatus == IOrder.Status.Completed || toStatus == IOrder.Status.Closed) {
-      (,bool found) = _removeActiveOrder(_msgSender(), order.id);
+      (,bool found) = _removeActiveOrder(order.owner, order.id);
       require(found, "Order is not found as active. Should never happen!");
     }
 
@@ -325,14 +325,7 @@ contract Marketplace is Ownable, Pausable {
    * Removes an order from active user orders
    */
   function _removeActiveOrder(address user, uint orderId) internal returns (uint index, bool found) {
-    if (userActiveOrders[user].length == 1 && userActiveOrders[user][0] == orderId) {
-      found = true;
-      index = 0;
-      userActiveOrders[user].pop();
-      return (index, found);
-    }
-
-    for (uint i = 0; i <= userActiveOrders[user].length; i++){
+    for (uint i = 0; i < userActiveOrders[user].length; i++){
       if (userActiveOrders[user][i] == orderId) {
         found = true;
         index = i;
