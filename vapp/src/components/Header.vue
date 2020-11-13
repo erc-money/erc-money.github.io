@@ -18,7 +18,7 @@
         </c-col>
       </c-row>
     </c-col>
-    <c-col span="15" class="controls">
+    <c-col span="16" class="controls">
       <c-button-group>
         <router-link to="/" v-slot="{ href, navigate }">
           <c-button icon="tradingdata" :class="[$route.name == 'market' && 'active-route']" @click="navigate(href)">Market</c-button>
@@ -166,7 +166,8 @@ export default {
 }
 
 @media screen and (max-width: 1200px) {
-  #logo-text {
+  #logo-text,
+  #network {
     display: none;
   }
 }

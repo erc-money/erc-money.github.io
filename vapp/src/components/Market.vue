@@ -407,7 +407,7 @@ export default {
     },
 
     async create(allowPartial) {
-      if (this.creating) {
+      if (this.creating || !this.createValid) {
         return;
       }
 

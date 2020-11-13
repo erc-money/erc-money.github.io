@@ -9,19 +9,19 @@
     <c-layout id="main-container" v-if="isOnline || $route.name == 'about'">
       <c-main>
         <c-row class="grid" gutter="10">
-          <c-col v-if="isOnline"
-            xs="12"
-            sm="12"
-            md="8"
+          <c-col id="wallet-container" v-if="isOnline"
+            xs="0"
+            sm="0"
+            md="0"
             lg="8"
             xl="8"
             xxl="8">
             <Wallet/>
           </c-col>
           <c-col
-            :xs="isOnline ? 12 : 24"
-            :sm="isOnline ? 12 : 24"
-            :md="isOnline ? 16 : 24"
+            :xs="24"
+            :sm="24"
+            :md="24"
             :lg="isOnline ? 16 : 24"
             :xl="isOnline ? 16 : 24"
             :xxl="isOnline ? 16 : 24">
@@ -253,5 +253,12 @@ footer {
 .c-button-content {
   color: #5D354D;
   font-family: Audiowide;
+}
+
+/* "lg" row */
+@media screen and (max-width: 993px) {
+  #wallet-container {
+    display: none;
+  }
 }
 </style>

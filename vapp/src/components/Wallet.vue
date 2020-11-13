@@ -89,6 +89,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
+  text-align: right;
 }
 
 .eth-address:hover {
@@ -109,13 +110,19 @@ export default {
   display: none;
 }
 
-@media screen and (max-width: 1200px) {
+/* "lg" row */
+@media screen and (max-width: 993px) {
   .etherscan-icon {
     display: inline-block;
   }
+
+  #wallet-container {
+    display: none;
+  }
 }
 
-@media screen and (min-width: 1200px) {
+/* "lg" row */
+@media screen and (min-width: 993px) {
   .etherscan-text {
     display: inline-block;
   }
