@@ -93,14 +93,14 @@ module.exports = {
     rinkeby: {
       provider: providerFunctor("rinkeby"),
       network_id: 4,
-      gas: 2000000,
+      gas: 10000000,
       gasPrice: gasPrice("rinkeby"),
       skipDryRun: true,
     },
     mainnet: {
       provider: providerFunctor("mainnet"),
       network_id: 1,
-      gas: 3000000,
+      gas: 8000000,
       gasPrice: gasPrice("mainnet"),
       skipDryRun: true,
     },
