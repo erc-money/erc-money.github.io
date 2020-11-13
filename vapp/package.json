@@ -5,8 +5,7 @@
   "scripts": {
     "serve": "npx vue-cli-service serve",
     "build": "npx vue-cli-service build --dest ../docs",
-    "lint": "npx vue-cli-service lint",
-    "preinstall": "npx npm-force-resolutions"
+    "lint": "npx vue-cli-service lint"
   },
   "dependencies": {
     "@metamask/controllers": "^4.0.2",
