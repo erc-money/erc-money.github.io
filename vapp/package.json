@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@metamask/controllers": "^4.0.2",
-    "@metamask/etherscan-link": "^1.2.0",
     "@metamask/logo": "^2.5.0",
     "@truffle/contract": "^4.2.29",
     "augmented-ui": "^2.0.0",

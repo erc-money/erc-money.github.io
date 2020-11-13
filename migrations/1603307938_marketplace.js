@@ -37,12 +37,6 @@ module.exports = async function (deployer, network) {
       deployer.deploy(TokenB),
     ]);
 
-    console.info('Mint some test tokens to', accounts[0]);
-    await Promise.all([
-      tokenA.mint(accounts[0], TEST_TOKENS_AMOUNT),
-      tokenB.mint(accounts[0], TEST_TOKENS_AMOUNT),
-    ]);
-
     // Mainly for Ganache...
     if (accounts[1]) {
       console.info('Mint some test tokens to', accounts[1]);
