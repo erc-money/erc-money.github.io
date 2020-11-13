@@ -237,9 +237,6 @@ export default class Blockchain {
       });
     }
 
-    // eslint-disable-next-line no-console
-    console.info('[BC]', state);
-
     if (typeof this.listener === 'function') {
       this.listener(state);
     }

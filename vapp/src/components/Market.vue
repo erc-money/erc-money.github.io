@@ -49,7 +49,8 @@
               <c-table-column field="partial" text="Partial"></c-table-column>
               <c-table-column field="_" text="Actions">
                 <template slot-scope="props">
-                  <c-button icon="trust" v-on:click="setCurrent(props.value)">Exchange</c-button>
+                  <c-button v-if="isSameAddress(props.value.owner, wallet)" icon="close" v-on:click="close(props.value.id)">Close</c-button>
+                  <c-button v-else icon="trust" v-on:click="setCurrent(props.value)">Exchange</c-button>
                 </template>
               </c-table-column>
             </c-table>
