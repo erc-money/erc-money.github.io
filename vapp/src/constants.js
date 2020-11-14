@@ -17,3 +17,4 @@ export const CONTRACTS = [
 ];
 export const ORDERS_PAGE_SIZE = 100;
 export const DEFAULT_TAB = 'market';
+export const BLOCKCHAIN_STATE_DEBOUNCE = 500;

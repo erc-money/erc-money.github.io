@@ -8,9 +8,10 @@ import {
   NetworkController,
   util
 } from '@metamask/controllers'
-import { POOL_INTERVAL, IPFS_GATEWAY, WATCH_TOKENS } from '../constants'
+import debounce from 'debounce'
+import { POOL_INTERVAL, IPFS_GATEWAY, WATCH_TOKENS, BLOCKCHAIN_STATE_DEBOUNCE } from '../constants'
 import contractsFactory from './contracts-factory'
-import marketplaceHandlers from './marketplace-handlers';
+import marketplaceHandlers from './marketplace-handlers'
 
 export default class Blockchain {
   constructor() {
@@ -21,6 +22,7 @@ export default class Blockchain {
     this.tokens = [];
     this.handlers = { ...marketplaceHandlers };
     this.handlersState = {};
+    this._debounceListener = debounce(this._listener.bind(this), BLOCKCHAIN_STATE_DEBOUNCE);
   }
 
   initialize() {
@@ -60,14 +62,14 @@ export default class Blockchain {
       },
       NetworkController: {},
     });
-    this.datamodel.subscribe(this._listener.bind(this));
+    this.datamodel.subscribe(this._debounceListener);
 
     return this;
   }
 
   reinitialize() {
     if (this.datamodel) {
-      this.datamodel.unsubscribe(this._listener.bind(this));
+      this.datamodel.unsubscribe(this._debounceListener);
       // shutdown ticker
       if (this.datamodel.context.AccountTrackerController.handle) {
         clearTimeout(this.datamodel.context.AccountTrackerController.handle);
@@ -130,11 +132,19 @@ export default class Blockchain {
 
     if (onlyMissing && missingTokens.length <= 0) {
       return this;
+    } else if (onlyMissing) {
+      this.tokens.push(...missingTokens);
+    } else {
+      this.tokens = await this._augmentTokens(tokens);
     }
-
-    this.tokens = await this._augmentTokens(tokens);
-
-    await this._configureTokens();
+    
+    await Promise.all((onlyMissing ? missingTokens : this.tokens).map(token => {
+      return this.datamodel.context.AssetsController.addToken(
+        token.address,
+        token.symbol,
+        token.decimals,
+      );
+    }));
 
     this._configureController('TokenBalancesController', {
       interval,
@@ -168,16 +178,6 @@ export default class Blockchain {
   removeHandler(stateKey) {
     delete this.handlers[stateKey];
     return this;
-  }
-
-  async _configureTokens() {
-    await Promise.all(this.tokens.map(token => {
-      return this.datamodel.context.AssetsController.addToken(
-        token.address,
-        token.symbol,
-        token.decimals,
-      );
-    }));
   }
 
   async _augmentTokens(tokens) {
@@ -220,7 +220,7 @@ export default class Blockchain {
       });
     }));
 
-    this._listener();
+    this._debounceListener();
   }
 
   _configureController(controller, config) {

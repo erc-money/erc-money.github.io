@@ -13,6 +13,7 @@
     "@truffle/contract": "^4.2.29",
     "augmented-ui": "^2.0.0",
     "cyberpunk-vue": "^0.4.1",
+    "debounce": "^1.2.0",
     "ethereumjs-util": "^7.0.7",
     "prettier": "^1.18.2",
     "vue": "^2.6.10",
