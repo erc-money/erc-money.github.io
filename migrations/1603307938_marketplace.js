@@ -27,7 +27,8 @@ module.exports = async function (deployer, network) {
   console.info('Setup Marketplace reward');
   await marketplace.updateReward(token.address, params._reward);
 
-  if (network != "mainnet") {
+  // not mainnet and not test nor coverage
+  if (network != "mainnet" && network != "development") {
     // deploy test tokens
     console.info('Deploy test tokens');
     const tokenA = await deployer.deploy(TokenA);
