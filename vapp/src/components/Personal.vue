@@ -1,7 +1,17 @@
 <template>
   <c-tabs-pane name="personal">
     <div>
+      <h1 v-if="personalOrders.length > 0">Create an Order.</h1>
+      <h1 v-else>Create your first Order.</h1>
+
       <c-row class="grid">
+        <c-col span="10">
+          <c-input placeholder="Token Address" v-model="fromToken"></c-input>
+        </c-col>
+        <c-col span="2"></c-col>
+        <c-col span="8">
+          <c-input placeholder="Give" :readonly="!fromSymbol || !fromDecimals" v-model="createFromHumanAmount"></c-input>
+        </c-col>
         <c-col span="4">
           <div class="token-details">
             <a v-if="fromAddress" :href="etherscanTokenLink(fromAddress)" target="_blank">
@@ -10,14 +20,15 @@
             <span v-else>N/A</span>
           </div>
         </c-col>
-        <c-col span="10">
-          <c-input placeholder="Token Address" v-model="fromToken"></c-input>
-        </c-col>
-        <c-col span="10">
-          <c-input placeholder="Give" :readonly="!fromSymbol || !fromDecimals" v-model="createFromHumanAmount"></c-input>
-        </c-col>
       </c-row>
       <c-row class="grid">
+        <c-col span="10">
+          <c-input placeholder="Token Address" v-model="toToken"></c-input>
+        </c-col>
+        <c-col span="2"></c-col>
+        <c-col span="8">
+          <c-input placeholder="Get" :readonly="!toSymbol || !toDecimals" v-model="createToHumanAmount"></c-input>
+        </c-col>
         <c-col span="4">
           <div class="token-details">
             <a v-if="toAddress" :href="etherscanTokenLink(toAddress)" target="_blank">
@@ -25,12 +36,6 @@
             </a>
             <span v-else>N/A</span>
           </div>
-        </c-col>
-        <c-col span="10">
-          <c-input placeholder="Token Address" v-model="toToken"></c-input>
-        </c-col>
-        <c-col span="10">
-          <c-input placeholder="Get" :readonly="!toSymbol || !toDecimals" v-model="createToHumanAmount"></c-input>
         </c-col>
       </c-row>
       <c-row class="grid">
