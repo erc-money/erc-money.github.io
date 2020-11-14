@@ -1,6 +1,12 @@
 <template>
   <c-row class="grid">
-    <c-col span="8">
+    <c-col
+      xs="0"
+      sm="0"
+      md="0"
+      lg="8"
+      xl="8"
+      xxl="8" id="logo-container">
       <c-row class="grid">
         <c-col span="4">
           <div id="logo" class="color-hl-bg">
@@ -9,7 +15,8 @@
             </a>
           </div>
         </c-col>
-        <c-col span="16">
+        <c-col span="1"></c-col>
+        <c-col span="19">
           <div id="logo-text" class="glitch color-hl" data-text="no fees <Ξ/> no regulation no bullshit">
             no fees<br/>
             no regulation<br/>
@@ -18,18 +25,31 @@
         </c-col>
       </c-row>
     </c-col>
-    <c-col span="16" class="controls">
+    <c-col
+      xs="24"
+      sm="24"
+      md="24"
+      lg="16"
+      xl="16"
+      xxl="16"
+      class="controls">
       <c-button-group>
         <router-link to="/" v-slot="{ href, navigate }">
-          <c-button icon="tradingdata" :class="[$route.name == 'market' && 'active-route']" @click="navigate(href)">Market</c-button>
+          <c-button icon="tradingdata" :class="[$route.name == 'market' && 'active-route']" @click="navigate(href)">
+            <span class="buttons-long-desc">Market</span>
+          </c-button>
         </router-link>
 
         <router-link to="/stats" v-slot="{ href, navigate }">
-          <c-button icon="tradingvolume" :class="[$route.name == 'stats' && 'active-route']" @click="navigate(href)">Stats</c-button>
+          <c-button icon="tradingvolume" :class="[$route.name == 'stats' && 'active-route']" @click="navigate(href)">
+            <span class="buttons-long-desc">Statistics</span>
+          </c-button>
         </router-link>
 
         <router-link to="/about" v-slot="{ href, navigate }">
-          <c-button icon="help" :class="[$route.name == 'about' && 'active-route']" @click="navigate(href)">About</c-button>
+          <c-button icon="help" :class="[$route.name == 'about' && 'active-route']" @click="navigate(href)">
+            <span class="buttons-long-desc">About</span>
+          </c-button>
         </router-link>
       </c-button-group>
 
@@ -165,9 +185,28 @@ export default {
   padding-right: 10px !important;
 }
 
-@media screen and (max-width: 1200px) {
-  #logo-text,
+@media screen and (max-width: 333px) {
   #network {
+    display: none;
+  }
+}
+
+/* "lg" row */
+@media screen and (max-width: 993px) {
+  #logo-container,
+  #logo-text {
+    display: none;
+  }
+
+  .controls {
+    text-align: center;
+    padding-right: none;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .buttons-long-desc {
     display: none;
   }
 }

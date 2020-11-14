@@ -19,9 +19,9 @@
             <Wallet/>
           </c-col>
           <c-col
-            :xs="24"
-            :sm="24"
-            :md="24"
+            xs="24"
+            sm="24"
+            md="24"
             :lg="isOnline ? 16 : 24"
             :xl="isOnline ? 16 : 24"
             :xxl="isOnline ? 16 : 24">
