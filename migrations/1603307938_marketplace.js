@@ -27,19 +27,50 @@ module.exports = async function (deployer, network) {
   console.info('Setup Marketplace reward');
   await marketplace.updateReward(token.address, params._reward);
 
-  // not mainnet and not test nor coverage
-  if (network != "mainnet" && network != "development") {
-    // deploy test tokens
+  if (
+    // skip mainnet and coverage
+    ![ 'soliditycoverage', 'mainnet' ].includes(network)
+    // check mainly for Ganache provider
+    && accounts.length >= 2
+    // do not run when testing
+    && ![ 'test' ].includes(process.argv[2])) {
+
     console.info('Deploy test tokens');
     const tokenA = await deployer.deploy(TokenA);
     const tokenB = await deployer.deploy(TokenB);
 
-    // Mainly for Ganache...
-    if (accounts[1]) {
-      console.info('Mint some test tokens to', accounts[1]);
-      await tokenA.mint(accounts[1], TEST_TOKENS_AMOUNT);
-      await tokenB.mint(accounts[1], TEST_TOKENS_AMOUNT);
+    
+    const tokens = [ tokenA, tokenB ];
+    const owners = [ accounts[0], accounts[1] ];
+
+    console.info('Mint test tokens to', ...owners);
+    await Promise.all(tokens.map(async t => {
+      return Promise.all(owners.map(o => t.mint(o, TEST_TOKENS_AMOUNT)));
+    }));
+
+    console.info('Setup Marketplace allowance');
+    await Promise.all(tokens.map(async t => {
+      return Promise.all(owners.map(o => t.increaseAllowance(marketplace.address, TEST_TOKENS_AMOUNT, { from: o })));
+    }));
+
+    const orders = [];
+    const randomPair = () => {
+      const idx = Math.round(Math.random());
+      return {
+        from: tokens[idx].address,
+        fromAmount: web3.utils.toWei((Math.random() * 10).toString(), 'ether'),
+        to: tokens[idx == 1 ? 0 : 1].address,
+        toAmount: web3.utils.toWei((Math.random() * 10).toString(), 'ether'),
+        allowPartial: !!idx,
+        $options: { from: owners[idx] },
+      };
     }
+    for (let i = 0; i < 10; i++) {
+      orders.push(randomPair());
+    }
+
+    console.info('Add', orders.length, 'random orders');
+    await Promise.all(orders.map(o => marketplace.createOrder(...Object.values(o))));
   }
   
   return [ token, marketplace ];

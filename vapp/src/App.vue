@@ -255,6 +255,10 @@ footer {
   font-family: Audiowide;
 }
 
+button.disabled {
+  pointer-events: none;
+}
+
 /* "lg" row */
 @media screen and (max-width: 993px) {
   #wallet-container {

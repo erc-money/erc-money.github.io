@@ -37,7 +37,6 @@ const store = new Vuex.Store({
     network: state => state.network,
     wallet: state => state.wallet,
     blockchain: state => state.blockchain,
-    $blockchain: () => blockchain,
   },
   actions: {
     reset (store) {
@@ -46,6 +45,13 @@ const store = new Vuex.Store({
     updateBlockchain(store, { stateKey, value }) {
       store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value });
     },
+    addTokens(_store, { tokens }) {
+      blockchain.updateTokens(
+        { tokens },
+        /* refresh = */ false,
+        /* onlyMissing = */ true
+      );
+    },
     addBlockchainHandler(store, { stateKey, functor, value = null }) {
       blockchain.addHandler(stateKey, functor);
       store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value });
@@ -53,6 +59,12 @@ const store = new Vuex.Store({
     removeBlockchainHandler(_store, { stateKey, functor }) {
       blockchain.removeHandler(stateKey, functor);
       store.commit(SET_BLOCKCHAIN_GENERIC, { stateKey, value: undefined });
+    },
+    refreshBlockchainHandler(_store, { key }) {
+      blockchain.refreshHandler(key);
+    },
+    refreshBlockchainHandlers() {
+      blockchain.refreshHandlers();
     },
     setup (store, blockchainContext) {
       const { web3, wallet } = blockchainContext;

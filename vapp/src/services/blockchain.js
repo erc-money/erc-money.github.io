@@ -96,12 +96,12 @@ export default class Blockchain {
     this.listener = listener;
     this.contracts = contractsFactory(web3);
 
-    this._configureController('AccountTrackerController', {
+    await this._configureController('AccountTrackerController', {
       interval,
       provider: web3.currentProvider,
     });
 
-    this._configureController('AssetsContractController', {
+    await this._configureController('AssetsContractController', {
       provider: web3.currentProvider,
     });
     
@@ -117,7 +117,7 @@ export default class Blockchain {
     // set wallet address
     this.datamodel.context.PreferencesController.setSelectedAddress(wallet);
     
-    this._configureController('AssetsController', {
+    await this._configureController('AssetsController', {
       selectedAddress: wallet,
     });
 
@@ -146,7 +146,7 @@ export default class Blockchain {
       );
     }));
 
-    this._configureController('TokenBalancesController', {
+    await this._configureController('TokenBalancesController', {
       interval,
       tokens: this.tokens,
     });
@@ -163,7 +163,7 @@ export default class Blockchain {
     await Promise.all([
       util.safelyExecute(() => this.datamodel.context.AccountTrackerController.refresh()),
       util.safelyExecute(() => this.datamodel.context.TokenBalancesController.updateBalances()),
-      util.safelyExecute(() => this._refresh()),
+      util.safelyExecute(() => this.refreshHandlers()),
     ]);
 
     return this;
@@ -171,12 +171,38 @@ export default class Blockchain {
 
   async addHandler(stateKey, functor) {
     this.handlers[stateKey] = functor;
-    await this._refresh();
+    await this.refreshHandler(stateKey);
     return this;
   }
 
   removeHandler(stateKey) {
     delete this.handlers[stateKey];
+    return this;
+  }
+
+  async refreshHandler(key, updateState = true) {
+    const { flatState: state, web3, ethjsQuery } = this;
+
+    await util.safelyExecute(async () => {
+      this.handlersState[key] = await this.handlers[key]({ state, web3, ethjsQuery });
+    });
+
+    if (updateState) {
+      this._debounceListener();
+    }
+
+    return this;
+  }
+
+  async refreshHandlers(updateState = true) {
+    await Promise.all(Object.keys(this.handlers).map(key => {
+      return this.refreshHandler(key, false);
+    }));
+
+    if (updateState) {
+      this._debounceListener();
+    }
+    
     return this;
   }
 
@@ -206,25 +232,18 @@ export default class Blockchain {
   _poll(interval) {
     this.handle && clearTimeout(this.handle);
     this.handle = setTimeout(async () => {
-      await util.safelyExecute(() => this._refresh());
+      await util.safelyExecute(() => this.refreshHandlers());
       this._poll(interval);
     }, interval);
   }
 
-  async _refresh() {
-    const { flatState: state, web3, ethjsQuery } = this;
-
-    await Promise.all(Object.keys(this.handlers).map(key => {
-      return util.safelyExecute(async () => {
-        this.handlersState[key] = await this.handlers[key]({ state, web3, ethjsQuery });
-      });
-    }));
-
-    this._debounceListener();
-  }
-
-  _configureController(controller, config) {
+  async _configureController(controller, config) {
     this.datamodel.context[controller].configure(config, true, true);
+
+    // hack to start controller polling... weird...
+    if (config.interval && typeof this.datamodel.context[controller].poll === 'function') {
+      await util.safelyExecute(() => this.datamodel.context[controller].poll(config.interval));
+    }
   }
 
   _listener() {

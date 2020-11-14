@@ -111,9 +111,10 @@ export default {
       denominator = parseInt(denominator.toString(), 10);
 
       if (value.length < denominator) {
-        value = '0'.repeat(denominator - value.length) + '.' + value.substr(0, precision);
+        value = '0'.repeat(denominator - value.length) + '.' + (precision ? value.substr(0, precision) : value);
       } else {
-        value = value.substr(0, value.length - denominator) + '.' + value.substr(value.length - denominator, precision);
+        value = value.substr(0, value.length - denominator) + '.' +
+          (precision ? value.substr(value.length - denominator, precision) : value.substr(value.length - denominator));
       }
 
       return parseFloat(value)

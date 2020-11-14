@@ -95,7 +95,7 @@
       <c-button icon="arrow-lift" :disabled="offset == 0" @click="prev()">
         Prev
       </c-button>
-      <c-button icon="arrow-right" icon-position="right" :disabled="orders.length == 0" @click="next()">
+      <c-button icon="arrow-right" icon-position="right" :disabled="orders.length < pageSize" @click="next()">
         Next
       </c-button>
     </c-button-group>
@@ -108,6 +108,8 @@ import { debounce } from 'vue-debounce'
 import { ORDERS_PAGE_SIZE, GENERIC_TOKEN } from '../constants'
 import mixins from '../mixins'
 
+const ORDERS_STATE_KEY = 'orders';
+
 export default {
   mixins,
   name: "Exchange",
@@ -117,11 +119,10 @@ export default {
 
   created() {
     this.addBlockchainHandler({
-      stateKey: 'orders',
+      stateKey: ORDERS_STATE_KEY,
       functor: this._handleMarket.bind(this),
       value: [],
     });
-    this._handleMarketInternal();
   },
 
   data() {
@@ -159,7 +160,7 @@ export default {
 
     currentHumanAmount: {
       get() {
-        return this.humanValue(this.current.amount, this.current.order.fromDecimals);
+        return this.humanValue(this.current.amount, this.current.order.fromDecimals, null);
       },
       set(newValue) {
         this.updateCurrentHumanAmount.call(this, newValue);
@@ -169,7 +170,7 @@ export default {
 
   methods: {
     applySymbolFilter: debounce(function () {
-      this._handleMarketInternal();
+      this.refreshBlockchainHandler({ key: ORDERS_STATE_KEY } );
     }, '500ms'),
 
     updateCurrentHumanAmount: debounce(function (value) {
@@ -187,14 +188,14 @@ export default {
     next() {
       if (this.orders.length > 0) {
         this.offset++;
-        this._handleMarketInternal();
+        this.refreshBlockchainHandler({ key: ORDERS_STATE_KEY } );
       }
     },
 
     prev() {
       if (this.offset > 0) {
         this.offset--;
-        this._handleMarketInternal();
+        this.refreshBlockchainHandler({ key: ORDERS_STATE_KEY } );
       }
     },
 
@@ -232,7 +233,7 @@ export default {
           marketplace.orderPayoffAmount.call(order.id, amount),
           //token.allowance.call(this.wallet, Marketplace.address),
         ]);
-        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals);
+        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals, null);
 
         //if (!this.toBN(allowance).gte(this.toBN(payoffAmount))) {
           await token.increaseAllowance(Marketplace.address, payoffAmount, { from: this.wallet });
@@ -266,17 +267,6 @@ export default {
       } catch (error) {
         this.notify(`Unable to close Order#${ id }: ${ error.message }`);
       }
-    },
-
-    async _handleMarketInternal() {
-      this.$nextTick(async () => {
-        this.updateBlockchain({
-          stateKey: 'orders',
-          value: await this._handleMarket({
-            state: this.blockchain,
-          }),
-        });
-      });
     },
     
     async _handleMarket({ state }) {
@@ -342,7 +332,7 @@ export default {
       return orders;
     },
 
-    ...mapActions(['addBlockchainHandler', 'updateBlockchain']),
+    ...mapActions(['addBlockchainHandler', 'refreshBlockchainHandler']),
   },
 };
 </script>

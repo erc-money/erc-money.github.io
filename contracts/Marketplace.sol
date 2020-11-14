@@ -181,7 +181,7 @@ contract Marketplace is Ownable, Pausable {
       if ((!listOnlyActive || isOrderActive(orderId))
         && _matchOrderTokens(orders[orderId], matchSymbol)) {
         entries++;
-        newOffset = orderId + 1;
+        newOffset = y + 1;
         page[i] = orders[orderId];
       }
     }
@@ -355,7 +355,7 @@ contract Marketplace is Ownable, Pausable {
     }
   }
 
-  function _upperCaseByte(bytes1 _b1) internal view returns (bytes1) {
+  function _upperCaseByte(bytes1 _b1) internal pure returns (bytes1) {
     if (_b1 >= 0x61 && _b1 <= 0x7A) {
       return bytes1(uint8(_b1) - 32);
     }

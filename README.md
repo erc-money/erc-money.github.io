@@ -62,8 +62,8 @@ Deployments
 
   - *Mainnet* `Marketplace` Contract address: [N/A](https://etherscan.io/address/0x0)
   - *Mainnet* `iEMT` Token Contract: [N/A](https://rinkeby.etherscan.io/address/0x0)
-  - *Rinkeby* `Marketplace` Contract: [0xfAe9639C3637CD6658065f5577Bf71da5F989F5C](https://rinkeby.etherscan.io/address/0xfAe9639C3637CD6658065f5577Bf71da5F989F5C)
-  - *Rinkeby* `iEMT` Token Contract: [0x1b45EA5e3417384B7B2dCd1B490DcfFA7Aeaf0B3](https://rinkeby.etherscan.io/address/0x1b45EA5e3417384B7B2dCd1B490DcfFA7Aeaf0B3)
+  - *Rinkeby* `Marketplace` Contract: [0x4E942E1B0957f69F2A491D0Ce46B609df93067ce](https://rinkeby.etherscan.io/address/0x4E942E1B0957f69F2A491D0Ce46B609df93067ce)
+  - *Rinkeby* `iEMT` Token Contract: [0x287BD99De7a0540Ed910B7B3cdBEA0AB00aB9657](https://rinkeby.etherscan.io/address/0x287BD99De7a0540Ed910B7B3cdBEA0AB00aB9657)
 
 Analysis
 ------

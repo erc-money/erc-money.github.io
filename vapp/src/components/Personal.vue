@@ -107,7 +107,6 @@ export default {
       functor: this._handlePersonal.bind(this),
       value: [],
     });
-    this._handlePersonalInternal();
   },
 
   data() {
@@ -169,7 +168,7 @@ export default {
     createFromHumanAmount: {
       get() {
         return (this.fromAmount && this.fromDecimals)
-          ? this.humanValue(this.fromAmount, this.fromDecimals)
+          ? this.humanValue(this.fromAmount, this.fromDecimals, null)
           : '0';
       },
       set(newValue) {
@@ -180,7 +179,7 @@ export default {
     createToHumanAmount: {
       get() {
         return (this.toAmount && this.toDecimals)
-          ? this.humanValue(this.toAmount, this.toDecimals)
+          ? this.humanValue(this.toAmount, this.toDecimals, null)
           : '0';
       },
       set(newValue) {
@@ -287,7 +286,7 @@ export default {
           marketplace.orderPayoffAmount.call(order.id, amount),
           //token.allowance.call(this.wallet, Marketplace.address),
         ]);
-        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals);
+        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals, null);
 
         //if (!this.toBN(allowance).gte(this.toBN(payoffAmount))) {
           await token.increaseAllowance(Marketplace.address, payoffAmount, { from: this.wallet });
@@ -321,17 +320,6 @@ export default {
       } catch (error) {
         this.notify(`Unable to close Order#${ id }: ${ error.message }`);
       }
-    },
-
-    async _handlePersonalInternal() {
-      this.$nextTick(async () => {
-        this.updateBlockchain({
-          stateKey: 'personalOrders',
-          value: await this._handlePersonal.call(this, {
-            state: this.blockchain,
-          }),
-        });
-      });
     },
 
     async _handlePersonal({ state }) {
@@ -399,16 +387,12 @@ export default {
       }
 
       // add tokens to wallet
-      await this.$blockchain.updateTokens(
-        { tokens: Object.values(watchTokens) },
-        /* refresh = */ false,
-        /* onlyMissing = */ true
-      );
+      this.addTokens({ tokens: Object.values(watchTokens) });
 
       return orders;
     },
 
-    ...mapActions(['addBlockchainHandler', 'updateBlockchain']),
+    ...mapActions(['addBlockchainHandler', 'addTokens']),
   },
 };
 </script>
