@@ -53,7 +53,7 @@ npm run serve
 
 > Don't forget to add the project to your [`Ganache` settings](https://www.trufflesuite.com/docs/ganache/reference/ganache-settings#ganache-settings)
 
-Compile Dapp: `cd vapp && npm run build`
+Build Dapp: `./build.sh`
 
 > Built into `./docs` served by [GH Pages](https://erc.money)
 
@@ -68,8 +68,8 @@ Deployments
 Analysis
 ------
 
-  - [ConsenSys Solidity Metrics](/solidity-metrics.html)
-  - [Coverage Report](/coverage/index.html)
+  - [ConsenSys Solidity Metrics](https://erc.money/docs/solidity-metrics.html)
+  - [Coverage Report](https://erc.money/docs/coverage/index.html)
 
 Coverage
 ------
