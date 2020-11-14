@@ -57,18 +57,13 @@ Compile Dapp: `cd vapp && npm run build`
 Deployments
 ----------
 
-  - *Mainnet* Marketplace Contract address: [0x0](https://etherscan.io/address/0x0)
-  - *Rinkeby* Marketplace Contract: [0x0](https://rinkeby.etherscan.io/address/0x0)
-  - *Rinkeby* TokenA Contract: [0x0](https://rinkeby.etherscan.io/address/0x0)
-  - *Rinkeby* TokenB Contract: [0x0](https://rinkeby.etherscan.io/address/0x0)
+  - *Mainnet* `Marketplace` Contract address: [0x0](https://etherscan.io/address/0x0)
+  - *Rinkeby* `Marketplace` Contract: [0x24C7D6E3E144d414eBa5c0B26aDc234833cae065](https://rinkeby.etherscan.io/address/0x24C7D6E3E144d414eBa5c0B26aDc234833cae065)
+  - *Rinkeby* `aTST` Token Contract: [0x88A094759C5A395ea6Fc18F57fa540aDCd2Ef844](https://rinkeby.etherscan.io/address/0x88A094759C5A395ea6Fc18F57fa540aDCd2Ef844)
+  - *Rinkeby* `bTST` Token Contract: [0x543e02f333fD4caC1522203883B91B6741b93469](https://rinkeby.etherscan.io/address/0x543e02f333fD4caC1522203883B91B6741b93469)
 
 Analysis
 ------
 
   - [ConsenSys Solidity Metrics](/solidity-metrics.html)
   - [Coverage Report](/coverage/index.html)
-
-Coverage
-------
-
-**TBD**
