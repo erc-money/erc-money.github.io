@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: "cybox",
+  name: "Box",
 
   props: {
     noAnimate: Boolean, // don't animate (default: false)

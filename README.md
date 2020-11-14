@@ -1,7 +1,10 @@
-erc.money Dapp
+Erc.Money Dapp
 ===================
 
-This repository contains erc.money Dapp and the contracts written in Solidity language.
+[Erc.money](https://erc.money/) is an **unregulated** and **feeless** token **marketplace**
+supporting any ERC20 token with no need for any liquidity pool.
+
+*This repository contains erc.money Dapp and the contracts written in Solidity language.*
 
 Prerequisites
 --------
@@ -57,15 +60,13 @@ Compile Dapp: `cd vapp && npm run build`
 Deployments
 ----------
 
-  - *Mainnet* `Marketplace` Contract address: [0x0](https://etherscan.io/address/0x0)
-  - *Mainnet* `iEMT` Token Contract: [0x0](https://rinkeby.etherscan.io/address/0x0)
-  - *Rinkeby* `Marketplace` Contract: [0xa4307C6D0EA59eacc19e6cBa4208543b71F1Ecb0](https://rinkeby.etherscan.io/address/0xa4307C6D0EA59eacc19e6cBa4208543b71F1Ecb0)
-  - *Rinkeby* `iEMT` Token Contract: [0xB975F722ae44500a30e6736871dc7C6263AAce78](https://rinkeby.etherscan.io/address/0xB975F722ae44500a30e6736871dc7C6263AAce78)
-  - *Rinkeby* `aTST` Token Contract: [0x1DdFBD8c467CFd18d84004AA4D79B07B5e024A5d](https://rinkeby.etherscan.io/address/0x1DdFBD8c467CFd18d84004AA4D79B07B5e024A5d)
-  - *Rinkeby* `bTST` Token Contract: [0xA969b9CFc438214Bf1BCF5D0aD4E8CEa901B6840](https://rinkeby.etherscan.io/address/0xA969b9CFc438214Bf1BCF5D0aD4E8CEa901B6840)
+  - *Mainnet* `Marketplace` Contract address: [N/A](https://etherscan.io/address/0x0)
+  - *Mainnet* `iEMT` Token Contract: [N/A](https://rinkeby.etherscan.io/address/0x0)
+  - *Rinkeby* `Marketplace` Contract: [0xfAe9639C3637CD6658065f5577Bf71da5F989F5C](https://rinkeby.etherscan.io/address/0xfAe9639C3637CD6658065f5577Bf71da5F989F5C)
+  - *Rinkeby* `iEMT` Token Contract: [0x1b45EA5e3417384B7B2dCd1B490DcfFA7Aeaf0B3](https://rinkeby.etherscan.io/address/0x1b45EA5e3417384B7B2dCd1B490DcfFA7Aeaf0B3)
 
 Analysis
 ------
 
   - [ConsenSys Solidity Metrics](/solidity-metrics.html)
-  - [Coverage Report](/coverage/index.html)
+  <!-- - [Coverage Report](/coverage/index.html) -->

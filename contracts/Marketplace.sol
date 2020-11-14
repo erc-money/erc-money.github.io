@@ -281,7 +281,9 @@ contract Marketplace is Ownable, Pausable {
     order.from.safeTransferFrom(order.owner, wallet, amount);
     
     // send rewards
-    _reward(order.owner);
+    if (newStatus == IOrder.Status.Completed) {
+      _reward(order.owner);
+    }
     _reward(_msgSender());
 
     return true;

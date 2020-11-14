@@ -3,25 +3,35 @@
     <template v-slot:title>About</template>
     <template v-slot:content>
       <p>
-        <a href="http://erc.money">Erc.money</a> is an
-        <span class="highlight">unregulated</span> and <span class="highlight">fee-less</span>
-        platform that empowers ERC20 tokens exchange inbetween holders
-        with <span class="highlight">no liquidity needed</span>.
-        <br/>
-        Simply <span class="highlight">exchange your ERC20 tokens</span>, have fun and
-        <span class="highlight">receive <b>iEMT</b> reward tokens</span> for completed orders.
+        <Tag>Erc.money</Tag>
+        is an
+        <Tag>unregulated</Tag>
+        and
+        <Tag>feeless</Tag>
+        token
+        <Tag>marketplace</Tag>
+        supporting any ERC20 token with no need for any liquidity pool.
+      </p>
+      <p>
+        <Tag>Exchange any ERC20</Tag>
+        pair and
+        <Tag>receive reward tokens</Tag>
+        for you and the order issuer.
       </p>
       <p>
         Nowadays the crypto space is overpopulated with lots of CeFi and DeFi exchanges.
+        DeFi is indeed better, however it shares the same issue - it needs liquidity to function!
+        
         <br/>
-        DeFi is indeed better, however it shares the same complain- it needs liquidity to function!
-        <br/>
+        
         That said, <a href="http://erc.money">erc.money</a> is not a trading platform,
-        rather one to explore a vague amount of assets which might have value for you ;)
+        rather one to explore a vague amount of assets which might have value specifically for you ;)
       </p>
       <p>
-        We are <a href="https://github.com/erc-money">Open-Source</a> and are not charging fees, thus we definetly count on your <c-button icon="dollar" v-on:click="donate()">Support</c-button>.
-        Remember that helping is not always about money!
+        We are
+        <a href="https://github.com/erc-money">Open-Source</a>
+        and are not charging any fees, thus we definetly count on your
+        <c-button icon="dollar" v-on:click="donate()">Support</c-button>, but remember - helping is not always about the money!
       </p>
     </template>
   </Box>
@@ -31,6 +41,7 @@
 import mixins from '../mixins'
 
 import Box from './generic/Box.vue'
+import Tag from './generic/Tag.vue'
 
 export default {
   mixins,
@@ -38,6 +49,7 @@ export default {
 
   components: {
     Box,
+    Tag,
   },
 };
 </script>
@@ -46,16 +58,5 @@ export default {
 p {
   margin: 20px;
   line-height: 1.4em;
-}
-
-.highlight {
-  background-color: rgba(248, 218, 0, 0.3);
-  color: #5D354D;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 1.1em;
-  border-radius: 50%;
-  padding: 5px;
-  white-space: nowrap;
 }
 </style>

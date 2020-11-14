@@ -11,6 +11,8 @@ export default {
     paused: false,
     owner: null,
     reward: 0,
+    rewardSymbol: '',
+    rewardDecimals: 0,
     rewardsCount: 0,
     rewardsValue: 0,
     lastOrderId: 0,

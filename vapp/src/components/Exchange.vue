@@ -2,7 +2,7 @@
   <c-tabs-pane name="market">
     <h1>Current Reward - {{ humanReward }} {{ blockchain.rewardSymbol }}</h1>
 
-    <c-row class="grid filter">
+    <c-row class="grid filter" v-if="current === null">
       <c-col span="4"></c-col>
       <c-col span="18">
         <c-input placeholder="Filter Orders (by token symbol)" v-model="symbolFilter" size="large"></c-input>
@@ -51,12 +51,14 @@
     </c-table>
     <div v-else-if="current !== null">
       <c-row class="grid">
-        <c-col span="8">
+        <c-col span="11">
           <c-input placeholder="Amount" :readonly="current.order.allowPartial == false" v-model="currentHumanAmount"></c-input>
         </c-col>
-        <c-col span="16">
+        <c-col span="1"></c-col>
+        <c-col span="11">
           <c-input placeholder="Wallet" v-model="current.wallet"></c-input>
         </c-col>
+        <c-col span="1"></c-col>
       </c-row>
       <c-row class="grid">
         <c-col span="24">
@@ -70,18 +72,11 @@
             <a :href="etherscanAccountLink(current.wallet)" target="_blank">
               {{ current.wallet }}
             </a>
-            <hr/>
-            Rewards to be sent:
-            <br/>
-            {{ humanReward }} {{ blockchain.rewardSymbol }} -
-            <a :href="etherscanAccountLink(wallet)" target="_blank">
-              {{ wallet }}
+            and receive {{ humanReward }} {{ blockchain.rewardSymbol }} to
+            <a :href="etherscanAccountLink(current.wallet)" target="_blank">
+              {{ current.wallet }}
             </a>
-            <br/>
-            {{ humanReward }} {{ blockchain.rewardSymbol }} -
-            <a :href="etherscanAccountLink(current.order.owner)" target="_blank">
-              {{ current.order.owner }}
-            </a>
+            on top of it.
           </h1>
         </c-col>
       </c-row>
