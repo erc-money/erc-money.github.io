@@ -327,7 +327,7 @@ export default {
       this.$nextTick(async () => {
         this.updateBlockchain({
           stateKey: 'personalOrders',
-          value: await this._handlePersonal({
+          value: await this._handlePersonal.call(this, {
             state: this.blockchain,
           }),
         });
@@ -351,6 +351,7 @@ export default {
         return [];
       }
 
+      const watchTokens = {};
       const orders = [];
 
       for (const order of userOrders) {
@@ -383,7 +384,26 @@ export default {
           partial: order.allowPartial ? 'Yes' : 'No',
           _: order,
         });
+
+        // tokens to add to wallet
+        watchTokens[order.from] = {
+          address: order.from,
+          symbol: order.fromSymbol,
+          decimals: order.fromDecimals,
+        };
+        watchTokens[order.to] = {
+          address: order.to,
+          symbol: order.toSymbol,
+          decimals: order.toDecimals,
+        };
       }
+
+      // add tokens to wallet
+      await this.$blockchain.updateTokens(
+        { tokens: Object.values(watchTokens) },
+        /* refresh = */ false,
+        /* onlyMissing = */ true
+      );
 
       return orders;
     },

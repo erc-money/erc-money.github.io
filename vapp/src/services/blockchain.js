@@ -103,15 +103,13 @@ export default class Blockchain {
       provider: web3.currentProvider,
     });
     
-    await this.updateAccount({ wallet, tokens, interval }, true);
+    await this.updateAccount({ wallet, tokens, interval });
     this._poll(interval);
 
     return this;
   }
 
   async updateAccount({ wallet, tokens = [], interval = POOL_INTERVAL }, refresh = true) {
-    this.tokens = await this._augmentTokens(tokens);
-
     // add wallet to identities
     this.datamodel.context.PreferencesController.updateIdentities([ wallet ]);
     // set wallet address
@@ -120,6 +118,21 @@ export default class Blockchain {
     this._configureController('AssetsController', {
       selectedAddress: wallet,
     });
+
+    await this.updateTokens({ tokens, interval }, refresh, false);
+
+    return this;
+  }
+
+  async updateTokens({ tokens = [], interval = POOL_INTERVAL }, refresh = true, onlyMissing = false) {
+    const existingTokens = onlyMissing ? this.tokens.map(x => x.address.toLowerCase()) : [];
+    const missingTokens = tokens.filter(x => !existingTokens.includes(x.address.toLowerCase()));
+
+    if (onlyMissing && missingTokens.length <= 0) {
+      return this;
+    }
+
+    this.tokens = await this._augmentTokens(tokens);
 
     await this._configureTokens();
 
@@ -134,7 +147,7 @@ export default class Blockchain {
     }
 
     return this;
-  }
+  } 
 
   async refresh() {
     await Promise.all([
@@ -182,7 +195,8 @@ export default class Blockchain {
 
       return {
         address: tokenContract.address,
-        decimals, symbol,
+        decimals,
+        symbol,
       };
     }))));
     

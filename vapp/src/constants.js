@@ -8,7 +8,7 @@ export const WALLET_PRECISION = 5;
 export const GENERIC_TOKEN = 'ERC20';
 export const LIVE_TOKEN = 'EMToken';
 export const TEST_TOKENS = [ 'TokenA', 'TokenB' ];
-export const WATCH_TOKENS = [ LIVE_TOKEN, ...TEST_TOKENS ];
+export const WATCH_TOKENS = [ LIVE_TOKEN/*, ...TEST_TOKENS*/ ];
 export const CONTRACTS = [
   'Marketplace',
   GENERIC_TOKEN, 
