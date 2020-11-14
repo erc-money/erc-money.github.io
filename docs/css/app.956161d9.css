@@ -891,6 +891,12 @@ footer {
 }
 
 
+#symbol-filter {
+  width: 90%;
+}
+.c-row.filter {
+  margin-bottom: 20px;
+}
 .c-col-wrapper > .c-button-group {
   margin-top: 20px;
 }
@@ -1055,4 +1061,4 @@ p {
 }
 
 
-/*# sourceMappingURL=app.91ed55c1.css.map*/
+/*# sourceMappingURL=app.956161d9.css.map*/

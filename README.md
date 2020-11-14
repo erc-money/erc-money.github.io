@@ -58,9 +58,11 @@ Deployments
 ----------
 
   - *Mainnet* `Marketplace` Contract address: [0x0](https://etherscan.io/address/0x0)
-  - *Rinkeby* `Marketplace` Contract: [0x24C7D6E3E144d414eBa5c0B26aDc234833cae065](https://rinkeby.etherscan.io/address/0x24C7D6E3E144d414eBa5c0B26aDc234833cae065)
-  - *Rinkeby* `aTST` Token Contract: [0x88A094759C5A395ea6Fc18F57fa540aDCd2Ef844](https://rinkeby.etherscan.io/address/0x88A094759C5A395ea6Fc18F57fa540aDCd2Ef844)
-  - *Rinkeby* `bTST` Token Contract: [0x543e02f333fD4caC1522203883B91B6741b93469](https://rinkeby.etherscan.io/address/0x543e02f333fD4caC1522203883B91B6741b93469)
+  - *Mainnet* `iEMT` Token Contract: [0x0](https://rinkeby.etherscan.io/address/0x0)
+  - *Rinkeby* `Marketplace` Contract: [0xa4307C6D0EA59eacc19e6cBa4208543b71F1Ecb0](https://rinkeby.etherscan.io/address/0xa4307C6D0EA59eacc19e6cBa4208543b71F1Ecb0)
+  - *Rinkeby* `iEMT` Token Contract: [0xB975F722ae44500a30e6736871dc7C6263AAce78](https://rinkeby.etherscan.io/address/0xB975F722ae44500a30e6736871dc7C6263AAce78)
+  - *Rinkeby* `aTST` Token Contract: [0x1DdFBD8c467CFd18d84004AA4D79B07B5e024A5d](https://rinkeby.etherscan.io/address/0x1DdFBD8c467CFd18d84004AA4D79B07B5e024A5d)
+  - *Rinkeby* `bTST` Token Contract: [0xA969b9CFc438214Bf1BCF5D0aD4E8CEa901B6840](https://rinkeby.etherscan.io/address/0xA969b9CFc438214Bf1BCF5D0aD4E8CEa901B6840)
 
 Analysis
 ------

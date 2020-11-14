@@ -3,19 +3,21 @@
     <template v-slot:title>About</template>
     <template v-slot:content>
       <p>
-        <a href="http://erc.money">Erc.money</a> is an <span class="highlight">unregulated</span> and <span class="highlight">fee-less</span>
-        platform that empowers the exchange between ERC20 tokens holders <i>(ERC2 to ERC20)</i>
+        <a href="http://erc.money">Erc.money</a> is an
+        <span class="highlight">unregulated</span> and <span class="highlight">fee-less</span>
+        platform that empowers ERC20 tokens exchange inbetween holders
         with <span class="highlight">no liquidity needed</span>.
         <br/>
-        Simply <span class="highlight">exchange your tokens</span>, have fun and <span class="highlight">receive <b>iEMT</b> reward tokens</span> for completed orders.
+        Simply <span class="highlight">exchange your ERC20 tokens</span>, have fun and
+        <span class="highlight">receive <b>iEMT</b> reward tokens</span> for completed orders.
       </p>
       <p>
         Nowadays the crypto space is overpopulated with lots of CeFi and DeFi exchanges.
         <br/>
         DeFi is indeed better, however it shares the same complain- it needs liquidity to function!
         <br/>
-        That said, <a href="http://erc.money">erc.money</a> is not a trading platform, rather one to explore and unlock the value of
-        a vague amount of assets which might have value for you ;)
+        That said, <a href="http://erc.money">erc.money</a> is not a trading platform,
+        rather one to explore a vague amount of assets which might have value for you ;)
       </p>
       <p>
         We are <a href="https://github.com/erc-money">Open-Source</a> and are not charging fees, thus we definetly count on your <c-button icon="dollar" v-on:click="donate()">Support</c-button>.

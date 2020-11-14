@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IOrder.sol";
 import "./IToken.sol";
 
@@ -76,7 +77,7 @@ contract Marketplace is Ownable, Pausable {
   /**
    * @dev Order updated
    */
-  event OrderCreated(uint orderId);
+  event OrderCreated(uint orderId, string fromSymbol, string toSymbol);
 
   /**
    * @dev Order updated
@@ -163,7 +164,7 @@ contract Marketplace is Ownable, Pausable {
     }
   }
 
-  function listOrders(uint offset, uint size, bool listOnlyActive) public view
+  function listOrders(uint offset, uint size, bool listOnlyActive, string memory matchSymbol) public view
   returns (IOrder.Order[] memory page, uint newOffset, uint entries) {
     require(size <= 100, "Max page size is 100");
     page = new IOrder.Order[](size);
@@ -177,7 +178,8 @@ contract Marketplace is Ownable, Pausable {
 
       uint orderId = lastOrderId - y;
 
-      if (!listOnlyActive || isOrderActive(orderId)) {
+      if ((!listOnlyActive || isOrderActive(orderId))
+        && _matchOrderTokens(orders[orderId], matchSymbol)) {
         entries++;
         newOffset = orderId + 1;
         page[i] = orders[orderId];
@@ -207,10 +209,16 @@ contract Marketplace is Ownable, Pausable {
   returns (uint orderId) {
     require(fromAmount > 0 && toAmount > 0, "Amounts can not be 0");
     require(address(from) != address(to), "Token can not be the same");
-    require(address(from) != address(0), "Token 'from' should exist");
-    require(address(to) != address(0), "Token 'to' should exist");
-    require(bytes(from.symbol()).length > 0 && from.decimals() > 0, "From is not a valid ERC20 token");
-    require(bytes(to.symbol()).length > 0 && to.decimals() > 0, "To is not a valid ERC20 token");
+    require(Address.isContract(address(from)), "Token 'from' should be a contract");
+    require(Address.isContract(address(to)), "Token 'to' should be a contract");
+
+    string memory fromSymbol = from.symbol();
+    uint fromDecimals = from.decimals();
+    string memory toSymbol = to.symbol();
+    uint toDecimals = from.decimals();
+
+    require(bytes(fromSymbol).length > 0 && fromDecimals > 0, "Token 'from' is not a valid ERC20 token");
+    require(bytes(toSymbol).length > 0 && toDecimals> 0, "Token 'to' is not a valid ERC20 token");
     require(
       from.allowance(_msgSender(), address(this)) >= fromAmount,
       "Marketplace not allowed to spend desired amount of tokens"
@@ -222,10 +230,10 @@ contract Marketplace is Ownable, Pausable {
       fromAmount,
       to,
       toAmount,
-      from.symbol(),
-      from.decimals(),
-      to.symbol(),
-      to.decimals(),
+      fromSymbol,
+      fromDecimals,
+      toSymbol,
+      toDecimals,
       _msgSender(),
       allowPartial,
       orderId, // id
@@ -236,7 +244,7 @@ contract Marketplace is Ownable, Pausable {
     ordersStats[IOrder.Status.Open]++;
     userActiveOrders[_msgSender()].push(orderId);
 
-    emit OrderCreated(orderId);
+    emit OrderCreated(orderId, fromSymbol, toSymbol);
   }
 
   function closeOrder(uint orderId) public
@@ -313,6 +321,44 @@ contract Marketplace is Ownable, Pausable {
     } else {
       _unpause();
     }
+  }
+
+  function _matchOrderTokens(IOrder.Order memory order, string memory symbol) internal view returns (bool) {
+    return _matchString(order.fromSymbol, symbol) || _matchString(order.toSymbol, symbol);
+  }
+
+  function _matchString(string memory where, string memory what) internal view returns (bool found) {
+    bytes memory whereBytes = bytes(where);
+
+    if (whereBytes.length == 0) {
+      return true;
+    }
+
+    bytes memory whatBytes = bytes(what);
+
+    for (uint i = 0; i < whereBytes.length - whatBytes.length; i++) {
+      bool flag = true;
+
+      for (uint j = 0; j < whatBytes.length; j++) {
+        if (_upperCaseByte(whereBytes[i + j]) != _upperCaseByte(whatBytes[j])) {
+          flag = false;
+          break;
+        }
+      }
+
+      if (flag) {
+        found = true;
+        break;
+      }
+    }
+  }
+
+  function _upperCaseByte(bytes1 _b1) internal view returns (bytes1) {
+    if (_b1 >= 0x61 && _b1 <= 0x7A) {
+      return bytes1(uint8(_b1) - 32);
+    }
+
+    return _b1;
   }
 
   function _updateOrder(IOrder.Order storage order, IOrder.Status toStatus) internal {

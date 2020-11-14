@@ -2,6 +2,14 @@
   <c-tabs-pane name="market">
     <h1>Current Reward - {{ humanReward }} {{ blockchain.rewardSymbol }}</h1>
 
+    <c-row class="grid filter">
+      <c-col span="4"></c-col>
+      <c-col span="18">
+        <c-input placeholder="Filter Orders (by token symbol)" v-model="symbolFilter" size="large"></c-input>
+      </c-col>
+      <c-col span="4"></c-col>
+    </c-row>
+
     <c-table
       :bordered="false"
       :selectedItems="false"
@@ -127,6 +135,7 @@ export default {
       pageSize: ORDERS_PAGE_SIZE,
       offset: 0,
       offsets: [0],
+      filterSymbol: '',
 
       // trade
       current: null, // { order, amount, wallet }
@@ -143,6 +152,16 @@ export default {
       return this.humanValue(this.blockchain.reward, this.blockchain.rewardDecimals);
     },
 
+    symbolFilter: {
+      get() {
+        return this.filterSymbol;
+      },
+      set(newValue) {
+        this.filterSymbol = newValue;
+        this.applySymbolFilter.call(this);
+      },
+    },
+
     currentHumanAmount: {
       get() {
         return this.humanValue(this.current.amount, this.current.order.fromDecimals);
@@ -154,6 +173,10 @@ export default {
   },
 
   methods: {
+    applySymbolFilter: debounce(function () {
+      this._handleMarketInternal();
+    }, '500ms'),
+
     updateCurrentHumanAmount: debounce(function (value) {
       if (value.trim().length > 0) {
         this.current.amount = this.machineValue(value, this.current.order.fromDecimals);
@@ -275,7 +298,8 @@ export default {
       const { page, newOffset, entries } = await marketplace.listOrders.call(
         this.offsets[this.offset] || 0,
         this.pageSize,
-        /** listOnlyActive = */ true
+        /** listOnlyActive = */ true,
+        this.filterSymbol
       );
 
       if (parseInt(entries.toString(), 10) <= 0) {
@@ -329,6 +353,14 @@ export default {
 </script>
 
 <style>
+#symbol-filter {
+  width: 90%;
+}
+
+.c-row.filter {
+  margin-bottom: 20px;
+}
+
 .c-col-wrapper > .c-button-group {
   margin-top: 20px;
 }

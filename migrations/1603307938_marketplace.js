@@ -14,14 +14,12 @@ module.exports = async function (deployer, network) {
   const params = await presaleParams(null, network);
 
   console.info('Deploy main assets');
-  const [ token, marketplace ] = await Promise.all([
-    deployer.deploy(EMToken),
-    deployer.deploy(
-      Marketplace,
-      params._owner,
-      params._treasury
-    ),
-  ]);
+  const token = await deployer.deploy(EMToken);
+  const marketplace = await deployer.deploy(
+    Marketplace,
+    params._owner,
+    params._treasury
+  );
 
   console.info('Grant MINTER_ROLE to Marketplace');
   await token.grantRole(MINTER_ROLE, marketplace.address);
@@ -32,18 +30,14 @@ module.exports = async function (deployer, network) {
   if (network != "mainnet") {
     // deploy test tokens
     console.info('Deploy test tokens');
-    const [ tokenA, tokenB ] = await Promise.all([
-      deployer.deploy(TokenA),
-      deployer.deploy(TokenB),
-    ]);
+    const tokenA = await deployer.deploy(TokenA);
+    const tokenB = await deployer.deploy(TokenB);
 
     // Mainly for Ganache...
     if (accounts[1]) {
       console.info('Mint some test tokens to', accounts[1]);
-      await Promise.all([
-        tokenA.mint(accounts[1], TEST_TOKENS_AMOUNT),
-        tokenB.mint(accounts[1], TEST_TOKENS_AMOUNT),
-      ]);
+      await tokenA.mint(accounts[1], TEST_TOKENS_AMOUNT);
+      await tokenB.mint(accounts[1], TEST_TOKENS_AMOUNT);
     }
   }
   

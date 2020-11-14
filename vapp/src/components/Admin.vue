@@ -43,8 +43,8 @@
     <c-row class="grid">
       <c-col span="26">
         <toggle-button
-          width="90"
-          height="30"
+          :width="90"
+          :height="30"
           :color="{ checked: '#FCDA06', unchecked: '#5D354D' }"
           :labels="{ checked: 'Active', unchecked: 'Paused' }"
           :value="isActive"
