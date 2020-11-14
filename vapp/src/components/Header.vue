@@ -95,6 +95,7 @@ export default {
 }
 
 #logo-text {
+  margin-top: 5px;
   font-weight: lighter;
   filter: drop-shadow(0 0 1px #F8DA00);
 }
