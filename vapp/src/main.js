@@ -8,7 +8,8 @@ import VueClipboard from 'vue-clipboard2'
 import { ToggleButton } from 'vue-js-toggle-button'
 
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
-import 'augmented-ui/augmented-ui.min.css'
+// @todo It triggers an issue on css compilation, temporary included in index.html!
+// import 'augmented-ui/augmented-ui.min.css'
 
 import Blockchain from './services/blockchain'
 import App from './App.vue'
