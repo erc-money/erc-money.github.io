@@ -13,16 +13,18 @@
             <c-table-column field="paused" text="Status"></c-table-column>
             <c-table-column field="owner" text="Owner Address">
               <template slot-scope="props">
-                <a :href="etherscanAccountLink(props.value)" target="_blank">
+                <a v-if="props.value" :href="etherscanAccountLink(props.value)" target="_blank">
                   {{ shortenAddress(props.value) }}
                 </a>
+                <span v-else>N/A</span>
               </template>
             </c-table-column>
             <c-table-column field="address" text="Marketplace Address">
               <template slot-scope="props">
-                <a :href="etherscanAccountLink(props.value)" target="_blank">
+                <a v-if="props.value" :href="etherscanAccountLink(props.value)" target="_blank">
                   {{ shortenAddress(props.value) }}
                 </a>
+                <span v-else>N/A</span>
               </template>
             </c-table-column>
           </c-table>
@@ -104,7 +106,7 @@ export default {
     stats() {
       return [{
         address: this.blockchain.address,
-        paused: this.blockchain.paused ? 'Paused' : 'Active',
+        paused: this.blockchain.paused ? 'Paused' :  this.blockchain.address ? 'Active' : 'Not Deployed',
         owner: this.blockchain.owner,
         reward: this.humanValue(this.blockchain.reward, this.blockchain.rewardDecimals),
         rewardsCount: this.blockchain.rewardsCount.toString(),

@@ -99,7 +99,11 @@ export default {
     },
 
     shortenAddress(address, chars = 9) {
-      return `${ address.substr(0, chars) }...${ address.substr(-chars) }`;
+      if (!address) {
+        return 'N/A';
+      }
+
+      return `${ (address || '').substr(0, chars) }...${ (address || '').substr(-chars) }`;
     },
 
     humanValue(value, denominator = '18', precision = WALLET_PRECISION) {
