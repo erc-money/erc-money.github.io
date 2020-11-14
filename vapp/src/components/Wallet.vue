@@ -32,10 +32,10 @@
           <c-table-column field="link">
             <template slot-scope="props">
               <a :href="props.value" class="etherscan-text" target="_blank">
-                <c-button icon="link" size="small" v-on:click="nothing()">Etherscan</c-button>
+                <c-button icon="link" v-on:click="nothing()">Etherscan</c-button>
               </a>
               <a :href="props.value" class="etherscan-icon" target="_blank">
-                <c-button icon="link" size="small" v-on:click="nothing()">E</c-button>
+                <c-button icon="link" v-on:click="nothing()">E</c-button>
               </a>
             </template>
           </c-table-column>
