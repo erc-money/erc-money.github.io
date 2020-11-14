@@ -7,6 +7,8 @@ export default {
       balance: 0,
       tokens: [],
     },
+    paused: false,
+    owner: null,
     reward: 0,
     rewardsCount: 0,
     rewardsValue: 0,

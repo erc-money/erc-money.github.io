@@ -5,11 +5,12 @@ import Jazzicon from 'vue-jazzicon'
 import cyberpunk from 'cyberpunk-vue'
 import { Message } from 'cyberpunk-vue'
 import VueClipboard from 'vue-clipboard2'
-import Blockchain from './services/blockchain'
+import { ToggleButton } from 'vue-js-toggle-button'
 
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
 import 'augmented-ui/augmented-ui.min.css'
 
+import Blockchain from './services/blockchain'
 import App from './App.vue'
 
 import defaultState from './default-state'
@@ -20,6 +21,7 @@ Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
 Vue.use(VueClipboard)
+Vue.component('ToggleButton', ToggleButton)
 Vue.component(Jazzicon.name, Jazzicon)
 Message.install(Vue) // o_O oh that chinese guys...
 

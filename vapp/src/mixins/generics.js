@@ -6,6 +6,16 @@ export default {
     navigate(href) {
       this.$router.push(href);
     },
+    copyAddressToClipboard: async function (address = null) {
+      address = address || this.wallet;
+
+      try {
+        await this.$copyText(address);
+        this.notify(`Address "${address}" copied to clipboard.`);
+      } catch(error) {
+        this.notify(`Unable to copy address: ${error.message}`);
+      }
+    },
     donate(amount = DONATE_AMOUNT) {
       if (this.isOnline) {
         this.web3.eth.sendTransaction({

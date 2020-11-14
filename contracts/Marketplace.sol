@@ -39,6 +39,7 @@ contract Marketplace is Ownable, Pausable {
   // @dev active orders of an user
   mapping (address => uint[]) userActiveOrders;
 
+  // @dev orders status
   mapping (IOrder.Status => uint) ordersStats;
 
   // @dev blacklisted tokens count
@@ -303,6 +304,14 @@ contract Marketplace is Ownable, Pausable {
     } else {
       blacklistedTokensCount--;
       emit UnblacklistedToken(_token, _msgSender());
+    }
+  }
+
+  function freeze(bool state) public onlyOwner {
+    if (state) {
+      _pause();
+    } else {
+      _unpause();
     }
   }
 

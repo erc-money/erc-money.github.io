@@ -8,7 +8,7 @@
             <Jazzicon :address="$store.state.wallet" :diameter="50" />
           </c-col>
           <c-col span="20" class="eth-address">
-            <a @click.prevent="copyWallet()">
+            <a @click.prevent="copyAddressToClipboard()">
               {{ walletShort }}
               <c-icon type="copy"></c-icon>
             </a>
@@ -21,7 +21,13 @@
           :selectedItems="false"
           :dataSource="holdings"
         >
-          <c-table-column field="symbol"></c-table-column>
+          <c-table-column field="symbolAndAddress">
+            <template slot-scope="props">
+              <a @click.prevent="copyAddressToClipboard(props.value.address)" class="address-copy">
+                {{ props.value.symbol }}
+              </a>
+            </template>
+          </c-table-column>
           <c-table-column field="amount"></c-table-column>
           <c-table-column field="link">
             <template slot-scope="props">
@@ -51,15 +57,17 @@ export default {
   computed: {
     holdings() {
       const tokens = (this.blockchain.wallet.tokens || []).map(token => {
+        const { symbol, address, decimals, balance } = token;
+
         return {
-          symbol: token.symbol,
-          amount: this.humanValue(token.balance, token.decimals),
-          link: this.etherscanTokenLink(token.address),
+          symbolAndAddress: { symbol, address },
+          amount: this.humanValue(balance, decimals),
+          link: this.etherscanTokenLink(address),
         };
       });
 
       return [{
-        symbol: 'ETH',
+        symbolAndAddress: { symbol: 'ETH', address: null },
         amount: this.humanValue(this.blockchain.wallet.balance),
         link: this.etherscanAccountLink(this.wallet),
       }, ...tokens];
@@ -69,21 +77,14 @@ export default {
   components: {
     Box,
   },
-
-  methods: {
-    copyWallet: async function () {
-      try {
-        await this.$copyText(this.wallet);
-        this.notify(`Address "${this.wallet}" copied to clipboard.`);
-      } catch(error) {
-        this.notify(`Unable to copy address: ${error.message}`);
-      }
-    },
-  },
 };
 </script>
 
 <style>
+a.address-copy {
+  cursor: pointer;
+}
+
 .eth-address {
   line-height: 50px;
   white-space: nowrap;

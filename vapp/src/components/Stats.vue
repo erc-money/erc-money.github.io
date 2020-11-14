@@ -2,6 +2,22 @@
   <Box>
     <template v-slot:title>Statistics</template>
     <template v-slot:content>
+      <h1>General</h1>
+      <c-row class="grid">
+        <c-col span="24">
+          <c-table
+            :bordered="false"
+            :selectedItems="false"
+            :dataSource="stats"
+          >
+            <c-table-column field="paused" text="Status"></c-table-column>
+            <c-table-column field="owner" text="Owner Address"></c-table-column>
+          </c-table>
+        </c-col>
+      </c-row>
+
+      <br/>
+
       <h1>Rewards</h1>
       <c-row class="grid">
         <c-col span="24">
@@ -74,6 +90,8 @@ export default {
   computed: {
     stats() {
       return [{
+        paused: this.blockchain.paused ? 'Paused' : 'Active',
+        owner: this.blockchain.owner,
         reward: this.humanValue(this.blockchain.reward, this.blockchain.rewardDecimals),
         rewardsCount: this.blockchain.rewardsCount.toString(),
         rewardsValue: this.humanValue(this.blockchain.rewardsValue),
