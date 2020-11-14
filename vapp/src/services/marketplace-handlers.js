@@ -1,8 +1,9 @@
 import { LIVE_TOKEN } from '../constants'
 
 const MARKETPLACE_PROPS = {
-  owner: { contract: 'Marketplace', prop: 'owner' },
-  paused: { contract: 'Marketplace', prop: 'paused' },
+  owner: { contract: 'Marketplace' },
+  address: { contract: 'Marketplace' },
+  paused: { contract: 'Marketplace' },
   reward: { contract: 'Marketplace' },
   rewardSymbol: { contract: LIVE_TOKEN, prop: 'symbol' },
   rewardDecimals: { contract: LIVE_TOKEN, prop: 'decimals' },
@@ -21,7 +22,14 @@ const handlers = {};
 for (const key of Object.keys(MARKETPLACE_PROPS)) {
   handlers[key] = async ({ state }) => {
     const { contract, prop, args } = MARKETPLACE_PROPS[key];
-    return (await state[contract].deployed())[prop || key].call(...(args || []));
+    const func = prop || key;
+    const instance = await state[contract].deployed();
+
+    if (func === 'address') {
+      return instance.address;
+    }
+
+    return instance[func].call(...(args || []));
   };
 }
 

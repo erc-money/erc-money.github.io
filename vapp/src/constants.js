@@ -16,3 +16,4 @@ export const CONTRACTS = [
   ...TEST_TOKENS,
 ];
 export const ORDERS_PAGE_SIZE = 100;
+export const DEFAULT_TAB = 'market';

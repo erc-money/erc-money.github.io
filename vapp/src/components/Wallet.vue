@@ -9,7 +9,7 @@
           </c-col>
           <c-col span="20" class="eth-address">
             <a @click.prevent="copyAddressToClipboard()">
-              {{ walletShort }}
+              {{ shortenAddress(wallet) }}
               <c-icon type="copy"></c-icon>
             </a>
           </c-col>

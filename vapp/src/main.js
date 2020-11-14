@@ -35,7 +35,6 @@ const store = new Vuex.Store({
     web3: state => state.web3,
     network: state => state.network,
     wallet: state => state.wallet,
-    walletShort: state => `${state.wallet.substr(0, 7)}...${state.wallet.substr(-7)}`,
     blockchain: state => state.blockchain,
     $blockchain: () => blockchain,
   },

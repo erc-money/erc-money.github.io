@@ -16,7 +16,7 @@ export default {
         this.notify(`Unable to copy address: ${error.message}`);
       }
     },
-    donate(amount = DONATE_AMOUNT) {
+    async donate(amount = DONATE_AMOUNT) {
       if (this.isOnline) {
         this.web3.eth.sendTransaction({
           to: DONATE_WALLET,

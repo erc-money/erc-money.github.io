@@ -21,7 +21,7 @@ function prefixForNetwork(network) {
     default:
       prefix = ''
   }
-  
+
   return prefix;
 }
 
@@ -96,6 +96,10 @@ export default {
             )
         )
       ).toString();
+    },
+
+    shortenAddress(address, chars = 9) {
+      return `${ address.substr(0, chars) }...${ address.substr(-chars) }`;
     },
 
     humanValue(value, denominator = '18', precision = WALLET_PRECISION) {

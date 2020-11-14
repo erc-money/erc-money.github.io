@@ -26,6 +26,7 @@
 
 <script>
 import mixins from '../mixins'
+import { DEFAULT_TAB } from '../constants'
 
 import Box from './generic/Box.vue'
 import Exchange from './Exchange.vue'
@@ -45,14 +46,13 @@ export default {
 
   computed: {
     isMarketplaceOwner() {
-      return (this.blockchain.owner || '').toLowerCase()
-        == (this.wallet || '').toLowerCase();
+      return (this.blockchain.owner || '').toLowerCase() == (this.wallet || '').toLowerCase();
     },
   },
 
   data() {
     return {
-      tab: 'market',
+      tab: DEFAULT_TAB,
     }
   },
 };
