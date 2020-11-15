@@ -27,6 +27,7 @@
 <script>
 import mixins from '../mixins'
 import { DEFAULT_TAB } from '../constants'
+import routeGuards from '../helpers/route.guards'
 
 import Box from './generic/Box.vue'
 import Exchange from './Exchange.vue'
@@ -35,6 +36,7 @@ import Admin from './Admin.vue'
 
 export default {
   mixins,
+  ...routeGuards,
   name: "Market",
 
   components: {

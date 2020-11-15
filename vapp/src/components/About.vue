@@ -39,12 +39,14 @@
 
 <script>
 import mixins from '../mixins'
+import routeGuards from '../helpers/route.guards'
 
 import Box from './generic/Box.vue'
 import Tag from './generic/Tag.vue'
 
 export default {
   mixins,
+  ...routeGuards,
   name: "About",
 
   components: {

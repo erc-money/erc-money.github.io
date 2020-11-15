@@ -6,6 +6,7 @@ import cyberpunk from 'cyberpunk-vue'
 import { Message } from 'cyberpunk-vue'
 import VueClipboard from 'vue-clipboard2'
 import { ToggleButton } from 'vue-js-toggle-button'
+import VueGtag from 'vue-gtag'
 
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
 // @todo It triggers an issue on css compilation, temporary included in index.html!
@@ -16,18 +17,20 @@ import App from './App.vue'
 
 import defaultState from './default-state'
 import { SYNC_BLOCKCHAIN, RESET, SETUP, SET_BLOCKCHAIN_GENERIC } from './states'
+import { GOOGLE_ANALYTICS_ID } from './constants'
 import routes from './routes'
 
 Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
 Vue.use(VueClipboard)
+Vue.use(VueGtag, { config: { id: GOOGLE_ANALYTICS_ID } });
 Vue.component('ToggleButton', ToggleButton)
 Vue.component(Jazzicon.name, Jazzicon)
 Message.install(Vue) // o_O oh that chinese guys...
 
-const blockchain = new Blockchain();
-const router = new VueRouter({ routes });
+const blockchain = new Blockchain()
+const router = new VueRouter({ routes })
 const store = new Vuex.Store({
   state: defaultState,
   getters: {

@@ -91,11 +91,13 @@
 
 <script>
 import mixins from '../mixins'
+import routeGuards from '../helpers/route.guards'
 
 import Box from './generic/Box.vue'
 
 export default {
   mixins,
+  ...routeGuards,
   name: "Stats",
 
   components: {

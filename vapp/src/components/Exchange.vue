@@ -251,6 +251,9 @@ export default {
         this.notify(`[Order#${ order.id }] An amount of ${ this.currentHumanAmount } ${ order.fromSymbol } send to ${ wallet }.`);
         this.resetCurrent();
         this.exchanging = false;
+        this.pushAnalyticsEvent('match-order', {
+          samePayoutWallet: this.isSameAddress(wallet, this.wallet),
+        });
       } catch (error) {
         this.exchanging = false;
         this.notify(`Unable to claim Order#${ order.id } tokens: ${ error.message }`);
@@ -264,6 +267,7 @@ export default {
       try {
         await marketplace.closeOrder(id, { from: this.wallet });
         this.notify(`Order#${ id } successfully closed.`);
+        this.pushAnalyticsEvent('close-order');
       } catch (error) {
         this.notify(`Unable to close Order#${ id }: ${ error.message }`);
       }

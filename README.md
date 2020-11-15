@@ -4,7 +4,11 @@ Erc.Money Dapp
 [Erc.money](https://erc.money/) is an **unregulated** and **feeless** p2p **marketplace** 
 for ERC20 tokens with no liquidity involved.
 
-Checkout **[this Reddid thread](https://www.reddit.com/r/ethtrader/comments/jx35wn/unregulated_and_feeless_erc20_p2p_marketplace/)**...
+Checkout these
+**[Reddit Thread](https://www.reddit.com/r/ethtrader/comments/jx35wn/unregulated_and_feeless_erc20_p2p_marketplace/)**
+and
+**[CryptoCompare Post](https://www.cryptocompare.com/coins/eth/post/p_1622821)**
+...
 
 Prerequisites
 --------

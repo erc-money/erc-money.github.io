@@ -259,54 +259,14 @@ export default {
 
         this.notify(`Your Order has been created under ID Order@${ orderId.toString() }`);
         this.creating = false;
+        this.pushAnalyticsEvent('create-order', {
+          from: this.fromSymbol,
+          to: this.toSymbol,
+          partial: allowPartial,
+        });
       } catch (error) {
         this.creating = false;
         this.notify(`Unable to create the Order: ${ error.message }`);
-      }
-    },
-
-    async exchange() {
-      if (!this.current || this.exchanging) {
-        return;
-      }
-
-      this.exchanging = true;
-      const { order, amount, wallet } = this.current;
-      const {
-        Marketplace,
-        [GENERIC_TOKEN]: Token,
-      } = this.blockchain;
-      const marketplace = await Marketplace.deployed();
-      const token = await Token.at(order.to);
-
-      // @todo: Figure out a way to check allowance for desired order only
-      // this might use allowance set for other trades, thus breaking that ones...
-      try {
-        const [ payoffAmount/*, allowance*/ ] = await Promise.all([
-          marketplace.orderPayoffAmount.call(order.id, amount),
-          //token.allowance.call(this.wallet, Marketplace.address),
-        ]);
-        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals, null);
-
-        //if (!this.toBN(allowance).gte(this.toBN(payoffAmount))) {
-          await token.increaseAllowance(Marketplace.address, payoffAmount, { from: this.wallet });
-          // await this.awaitTxConfirmation(tx);
-          this.notify(`[Order#${ order.id }] Allowance of ${ humanPayoffAmount } ${ order.toSymbol } confirmed.`);
-        //}
-        
-        await marketplace.claimOrder(
-          order.id,
-          amount,
-          wallet,
-          { from: this.wallet }
-        );
-
-        this.notify(`[Order#${ order.id }] An amount of ${ this.currentHumanAmount } ${ order.fromSymbol } send to ${ wallet }.`);
-        this.resetCurrent();
-        this.exchanging = false;
-      } catch (error) {
-        this.exchanging = false;
-        this.notify(`Unable to claim Order#${ order.id } tokens: ${ error.message }`);
       }
     },
 
@@ -317,6 +277,7 @@ export default {
       try {
         await marketplace.closeOrder(id, { from: this.wallet });
         this.notify(`Order#${ id } successfully closed.`);
+        this.pushAnalyticsEvent('close-order');
       } catch (error) {
         this.notify(`Unable to close Order#${ id }: ${ error.message }`);
       }

@@ -1,47 +1,8 @@
 import { hexToString, BN } from 'ethereumjs-util'
 import fromExponential from 'from-exponential'
 import prettyNum, { PRECISION_SETTING } from 'pretty-num'
+import etherscanLink from '@metamask/etherscan-link'
 import { WALLET_PRECISION, DEFAULT_DENOMINATION/*, TX_POOL_INTERVAL, BLOCKS_CONFIRMATION*/ } from '../constants'
-
-function prefixForNetwork(network) {
-  const net = parseInt(network)
-  let prefix;
-
-  switch (net) {
-    case 1: // main net
-      prefix = ''
-      break
-    case 3: // ropsten test net
-      prefix = 'ropsten.'
-      break
-    case 4: // rinkeby test net
-      prefix = 'rinkeby.'
-      break
-    case 42: // kovan test net
-      prefix = 'kovan.'
-      break
-    default:
-      prefix = ''
-  }
-
-  return prefix;
-}
-
-function getEtherscanAccountLink(address, network) {
-  const prefix = prefixForNetwork(network);
-  return `https://${prefix}etherscan.io/address/${address}`;
-}
-
-function getEtherscanTokenLink(address, network, wallet = null) {
-  const prefix = prefixForNetwork(network);
-  return `https://${prefix}etherscan.io/token/${address}`
-    + (wallet ? `?a=${wallet}` : '');
-}
-
-function getEtherscanExplorerLink(hash, network) {
-  const prefix = prefixForNetwork(network);
-  return `https://${prefix}etherscan.io/tx/${hash}`;
-}
 
 export default {
   methods: {
@@ -54,7 +15,7 @@ export default {
     },
 
     etherscanTokenLink(token, address = null, network = null) {
-      return getEtherscanTokenLink(
+      return etherscanLink.createTokenTrackerLink(
         token,
         network || this.network,
         address || this.wallet
@@ -62,14 +23,14 @@ export default {
     },
 
     etherscanAccountLink(address = null, network = null) {
-      return getEtherscanAccountLink(
+      return etherscanLink.createAccountLink(
         address || this.wallet,
         network || this.network,
       );
     },
 
     etherscanExplorerLink(hash, network = null) {
-      return getEtherscanExplorerLink(
+      return etherscanLink.createExplorerLink(
         hash,
         network || this.network,
       );
