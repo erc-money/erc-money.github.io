@@ -1,10 +1,10 @@
 Erc.Money Dapp
 ===================
 
-[Erc.money](https://erc.money/) is an **unregulated** and **feeless** token **marketplace**
-supporting any ERC20 token with no need for any liquidity pool.
+[Erc.money](https://erc.money/) is an **unregulated** and **feeless** p2p **marketplace** 
+for ERC20 tokens with no liquidity involved.
 
-*This repository contains erc.money Dapp and the contracts written in Solidity language.*
+Checkout **[this Reddid thread](https://www.reddit.com/r/ethtrader/comments/jx35wn/unregulated_and_feeless_erc20_p2p_marketplace/)**...
 
 Prerequisites
 --------
