@@ -259,6 +259,10 @@ button.disabled {
   pointer-events: none;
 }
 
+button:hover {
+  filter: drop-shadow(0 0 10px #22EDFC);
+}
+
 /* "lg" row */
 @media screen and (max-width: 993px) {
   #wallet-container {
