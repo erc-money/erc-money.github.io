@@ -10,7 +10,7 @@ export default {
     pushAnalyticsEvent(event, payload = {}) {
       try {
         const isPageview = event === 'pageview';
-        const method = isPageview ? 'pageview' : 'event';
+        const method = isPageview ? event : 'event';
 
         // do not send raw address, hash it to avoid sending PIIs!!
         if (this.isOnline && !isPageview) {
