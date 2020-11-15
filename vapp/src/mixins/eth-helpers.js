@@ -1,5 +1,7 @@
 import { hexToString, BN } from 'ethereumjs-util'
-import { WALLET_PRECISION/*, TX_POOL_INTERVAL, BLOCKS_CONFIRMATION*/ } from '../constants'
+import fromExponential from 'from-exponential'
+import prettyNum, { PRECISION_SETTING } from 'pretty-num'
+import { WALLET_PRECISION, DEFAULT_DENOMINATION/*, TX_POOL_INTERVAL, BLOCKS_CONFIRMATION*/ } from '../constants'
 
 function prefixForNetwork(network) {
   const net = parseInt(network)
@@ -33,7 +35,7 @@ function getEtherscanAccountLink(address, network) {
 function getEtherscanTokenLink(address, network, wallet = null) {
   const prefix = prefixForNetwork(network);
   return `https://${prefix}etherscan.io/token/${address}`
-    + (wallet ? `?a=${ wallet }` : '');
+    + (wallet ? `?a=${wallet}` : '');
 }
 
 function getEtherscanExplorerLink(hash, network) {
@@ -78,8 +80,8 @@ export default {
       // await awaitMinedTransaction(this.web3, tx, { interval, blocksToWait: confirmations });
     },
 
-    machineValue(value, denominator = '18') {
-      value = (value || '').toString().trim();
+    machineValue(value, denominator = DEFAULT_DENOMINATION) {
+      value = (value || 0).toString().trim();
       let denominatorShift = 0;
 
       if (/\./.test(value)) {
@@ -90,7 +92,7 @@ export default {
 
       return this.toBN(value).mul(
         this.toBN(10).pow(
-          this.toBN(denominator)
+          this.toBN(denominator.toString())
             .sub(
               this.toBN(denominatorShift.toString())
             )
@@ -98,29 +100,29 @@ export default {
       ).toString();
     },
 
+    humanValue(value, denominator = DEFAULT_DENOMINATION, precision = WALLET_PRECISION) {
+      value = fromExponential((value || 0).toString().trim());
+      denominator = parseInt(denominator, 10);
+
+      if (value.length < denominator) {
+        value = `0.${ '0'.repeat(denominator - value.length) }${ value }`;
+      } else {
+        const [, pre, post ] = value.match(new RegExp(`^([0-9]*)([0-9]{${ denominator }})$`));
+        value = `${ pre || 0 }.${ post }`;
+      }
+
+      return prettyNum(
+        value,
+        { precision, precisionSetting: PRECISION_SETTING.REDUCE_SIGNIFICANT }
+      );
+    },
+
     shortenAddress(address, chars = 9) {
       if (!address) {
         return 'N/A';
       }
 
-      return `${ (address || '').substr(0, chars) }...${ (address || '').substr(-chars) }`;
-    },
-
-    humanValue(value, denominator = '18', precision = WALLET_PRECISION) {
-      value = (value || '').toString().trim();
-      denominator = parseInt(denominator.toString(), 10);
-
-      if (value.length < denominator) {
-        value = '0'.repeat(denominator - value.length) + '.' + (precision ? value.substr(0, precision) : value);
-      } else {
-        value = value.substr(0, value.length - denominator) + '.' +
-          (precision ? value.substr(value.length - denominator, precision) : value.substr(value.length - denominator));
-      }
-
-      return parseFloat(value)
-        .toString()
-        .replace(/^(.*\.[^0]*)0+$/, '$1')
-        .replace(/\.$/, '');
+      return `${(address || '').substr(0, chars)}...${(address || '').substr(-chars)}`;
     },
 
     hexToString(hex) {
