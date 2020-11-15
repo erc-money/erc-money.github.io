@@ -11,8 +11,8 @@
     "deploy:develop": "truffle deploy --network development",
     "deploy:testnet": "./gas.sh && truffle deploy --network rinkeby",
     "deploy": "./gas.sh && truffle deploy --network mainnet",
-    "verify:testnet": "truffle run verify Marketplace TokenA TokenB --network rinkeby",
-    "verify": "truffle run verify Marketplace --network mainnet",
+    "verify:testnet": "truffle run verify Marketplace EMToken --network rinkeby",
+    "verify": "truffle run verify Marketplace EMToken --network mainnet",
     "coverage": "truffle run coverage"
   },
   "author": "Alexander Cucer <alexander.moldova@gmail.com>",
