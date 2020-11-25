@@ -85,7 +85,7 @@ export default {
     },
 
     humanValue(value, denominator = DEFAULT_DENOMINATION, precision = WALLET_PRECISION) {
-      value = fromExponential((value || 0).toString().trim().replace(/[^0-9]+/g, ''));
+      value = fromExponential((value || 0).toString().trim()).replace(/[^0-9]+/g, '');
       denominator = parseInt(denominator, 10);
 
       if (value.length < denominator) {
