@@ -16,7 +16,7 @@
         </div>
       </c-col>
       <c-col span="8">
-        <c-input placeholder="Token Address" v-model="blacklistToken"></c-input>
+        <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="blacklistToken"></c-input>
       </c-col>
       <c-col span="10">
         <c-button icon="reduce" v-on:click="blacklist(true)" :loading="working" :disabled="!blacklistValid || blacklistStatus">Blacklist</c-button>
@@ -32,7 +32,7 @@
         </div>
       </c-col>
       <c-col span="8">
-        <c-input placeholder="New Reward" v-model="reward"></c-input>
+        <c-input placeholder="New Reward" v-mask="inputMask('amount')" v-model="reward"></c-input>
       </c-col>
       <c-col span="10">
         <c-button icon="credit-level" v-on:click="updateReward()" :loading="working">Update</c-button>

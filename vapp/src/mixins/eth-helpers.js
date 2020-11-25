@@ -2,10 +2,33 @@ import { hexToString, BN } from 'ethereumjs-util'
 import fromExponential from 'from-exponential'
 import prettyNum, { PRECISION_SETTING } from 'pretty-num'
 import etherscanLink from '@metamask/etherscan-link'
+import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 import { WALLET_PRECISION, DEFAULT_DENOMINATION/*, TX_POOL_INTERVAL, BLOCKS_CONFIRMATION*/ } from '../constants'
 
 export default {
   methods: {
+    inputMask(type) {
+      switch(type.toLowerCase()) {
+        case 'address':
+        case 'addr':
+          return `0x${ 'N'.repeat(40) }`;
+        case 'amount':
+        case 'value':
+        default:
+          return createNumberMask({
+            prefix: '',
+            decimalLimit: 18,
+            includeThousandsSeparator: false,
+            allowDecimal: true,
+            allowNegative: false,
+          });
+      }
+    },
+
+    addressInputMask() {
+      return `0x${ 'N'.repeat(40) }`;
+    },
+
     isSameAddress(a, b) {
       return (a || '').toLowerCase() === (b || '').toLowerCase();
     },
@@ -42,7 +65,7 @@ export default {
     },
 
     machineValue(value, denominator = DEFAULT_DENOMINATION) {
-      value = (value || 0).toString().trim();
+      value = (value || 0).toString().trim().replace(/[^0-9\.]+/g, '');
       let denominatorShift = 0;
 
       if (/\./.test(value)) {
@@ -62,7 +85,7 @@ export default {
     },
 
     humanValue(value, denominator = DEFAULT_DENOMINATION, precision = WALLET_PRECISION) {
-      value = fromExponential((value || 0).toString().trim());
+      value = fromExponential((value || 0).toString().trim().replace(/[^0-9]+/g, ''));
       denominator = parseInt(denominator, 10);
 
       if (value.length < denominator) {
@@ -91,7 +114,7 @@ export default {
     },
 
     toBN(value = null) {
-      return new BN((value || 0).toString());
+      return new BN((value || 0).toString().replace(/[^0-9]+/g, ''));
     },
   },
 }

@@ -6,11 +6,11 @@
 
       <c-row class="grid">
         <c-col span="10">
-          <c-input placeholder="Token Address" v-model="fromToken"></c-input>
+          <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="fromToken"></c-input>
         </c-col>
         <c-col span="2"></c-col>
         <c-col span="8">
-          <c-input placeholder="Give" :readonly="!fromSymbol || !fromDecimals" v-model="createFromHumanAmount"></c-input>
+          <c-input placeholder="Give" :readonly="!fromSymbol || !fromDecimals" v-mask="inputMask('amount')" v-model="createFromHumanAmount"></c-input>
         </c-col>
         <c-col span="4">
           <div class="token-details">
@@ -23,11 +23,11 @@
       </c-row>
       <c-row class="grid">
         <c-col span="10">
-          <c-input placeholder="Token Address" v-model="toToken"></c-input>
+          <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="toToken"></c-input>
         </c-col>
         <c-col span="2"></c-col>
         <c-col span="8">
-          <c-input placeholder="Get" :readonly="!toSymbol || !toDecimals" v-model="createToHumanAmount"></c-input>
+          <c-input placeholder="Get" :readonly="!toSymbol || !toDecimals" v-mask="inputMask('amount')" v-model="createToHumanAmount"></c-input>
         </c-col>
         <c-col span="4">
           <div class="token-details">

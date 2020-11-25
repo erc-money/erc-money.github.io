@@ -7,6 +7,7 @@ import { Message } from 'cyberpunk-vue'
 import VueClipboard from 'vue-clipboard2'
 import { ToggleButton } from 'vue-js-toggle-button'
 import VueGtag from 'vue-gtag'
+import VueMask from 'v-mask'
 
 import 'cyberpunk-vue/lib/cyberpunk-vue.css'
 // @todo It triggers an issue on css compilation, temporary included in index.html!
@@ -24,6 +25,7 @@ Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(cyberpunk)
 Vue.use(VueClipboard)
+Vue.use(VueMask)
 Vue.use(VueGtag, { config: { id: GOOGLE_ANALYTICS_ID } });
 Vue.component('ToggleButton', ToggleButton)
 Vue.component(Jazzicon.name, Jazzicon)

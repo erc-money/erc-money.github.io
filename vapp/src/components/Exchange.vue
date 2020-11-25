@@ -52,11 +52,11 @@
     <div v-else-if="current !== null">
       <c-row class="grid">
         <c-col span="11">
-          <c-input placeholder="Amount" :readonly="current.order.allowPartial == false" v-model="currentHumanAmount"></c-input>
+          <c-input placeholder="Amount" :readonly="current.order.allowPartial == false" v-mask="inputMask('amount')" v-model="currentHumanAmount"></c-input>
         </c-col>
         <c-col span="1"></c-col>
         <c-col span="11">
-          <c-input placeholder="Wallet" v-model="current.wallet"></c-input>
+          <c-input placeholder="Wallet" v-mask="inputMask('addr')" v-model="current.wallet"></c-input>
         </c-col>
         <c-col span="1"></c-col>
       </c-row>
