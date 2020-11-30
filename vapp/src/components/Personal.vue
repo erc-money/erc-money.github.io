@@ -7,7 +7,7 @@
       <!-- FROM -->
       <c-row class="grid">
         <c-col span="10">
-          <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="fromToken"></c-input>
+          <c-input placeholder="Token Address (I want to give)" v-mask="inputMask('addr')" v-model="fromToken"></c-input>
         </c-col>
         <c-col span="2"></c-col>
         <c-col span="8">
@@ -26,7 +26,7 @@
       <!-- TO -->
       <c-row class="grid">
         <c-col span="10">
-          <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="toToken"></c-input>
+          <c-input placeholder="Token Address (I want to receive)" v-mask="inputMask('addr')" v-model="toToken"></c-input>
         </c-col>
         <c-col span="2"></c-col>
         <c-col span="8">
