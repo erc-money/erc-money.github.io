@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
-import Jazzicon from 'vue-jazzicon'
 import cyberpunk from 'cyberpunk-vue'
 import { Message } from 'cyberpunk-vue'
 import VueClipboard from 'vue-clipboard2'
@@ -28,7 +27,6 @@ Vue.use(VueClipboard)
 Vue.use(VueMask)
 Vue.use(VueGtag, { config: { id: GOOGLE_ANALYTICS_ID } });
 Vue.component('ToggleButton', ToggleButton)
-Vue.component(Jazzicon.name, Jazzicon)
 Message.install(Vue) // o_O oh that chinese guys...
 
 const blockchain = new Blockchain()

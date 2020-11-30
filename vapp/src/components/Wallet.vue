@@ -5,7 +5,7 @@
       <div id="wallet">
         <c-row class="grid">
           <c-col span="4">
-            <Jazzicon :address="$store.state.wallet" :diameter="50" />
+            <div id="identicon" v-html="identicon"></div>
           </c-col>
           <c-col span="20" class="eth-address">
             <a @click.prevent="copyAddressToClipboard()">
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import multiavatar from '@multiavatar/multiavatar'
 import mixins from '../mixins'
 
 import Box from './generic/Box.vue'
@@ -55,6 +56,10 @@ export default {
   name: "Wallet",
 
   computed: {
+    identicon() {
+      return multiavatar(this.wallet.toString());
+    },
+
     holdings() {
       const tokens = (this.blockchain.wallet.tokens || []).map(token => {
         const { symbol, address, decimals, balance } = token;
@@ -90,11 +95,15 @@ a.address-copy {
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
-  text-align: right;
+  margin-left: 10px;
 }
 
 .eth-address:hover {
   color: #5D354D;
+}
+
+#identicon {
+  width: 50px;
 }
 
 #wallet > .c-table-wrapper {
