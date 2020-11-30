@@ -66,8 +66,8 @@ Deployments
 
   - *Mainnet* `Marketplace` Contract address: [N/A](https://etherscan.io/address/0x0)
   - *Mainnet* `iEMT` Token Contract: [N/A](https://rinkeby.etherscan.io/address/0x0)
-  - *Rinkeby* `Marketplace` Contract: [0x4E942E1B0957f69F2A491D0Ce46B609df93067ce](https://rinkeby.etherscan.io/address/0x4E942E1B0957f69F2A491D0Ce46B609df93067ce)
-  - *Rinkeby* `iEMT` Token Contract: [0x287BD99De7a0540Ed910B7B3cdBEA0AB00aB9657](https://rinkeby.etherscan.io/address/0x287BD99De7a0540Ed910B7B3cdBEA0AB00aB9657)
+  - *Rinkeby* `Marketplace` Contract: [0x3D4511289d3EEa63a175E9481EFA18817274B8b9](https://rinkeby.etherscan.io/address/0x3D4511289d3EEa63a175E9481EFA18817274B8b9)
+  - *Rinkeby* `iEMT` Token Contract: [0x6B868a923246141D2Dc8E2828ea5221Ec829a073](https://rinkeby.etherscan.io/address/0x6B868a923246141D2Dc8E2828ea5221Ec829a073)
 
 Analysis
 ------
@@ -82,12 +82,12 @@ Coverage
 ------------------|----------|----------|----------|----------|----------------|
 File              |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
 ------------------|----------|----------|----------|----------|----------------|
- contracts/       |    96.46 |       75 |      100 |     96.9 |                |
+ contracts/       |    96.64 |    74.32 |      100 |    96.32 |                |
   EMToken.sol     |      100 |      100 |      100 |      100 |                |
   IOrder.sol      |      100 |      100 |      100 |      100 |                |
   IToken.sol      |      100 |      100 |      100 |      100 |                |
-  Marketplace.sol |    96.46 |       75 |      100 |     96.9 |336,363,394,398 |
+  Marketplace.sol |    96.64 |    74.32 |      100 |    96.32 |... 379,410,414 |
 ------------------|----------|----------|----------|----------|----------------|
-All files         |    96.46 |       75 |      100 |     96.9 |                |
+All files         |    96.64 |    74.32 |      100 |    96.32 |                |
 ------------------|----------|----------|----------|----------|----------------|
 ```

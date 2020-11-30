@@ -63,12 +63,16 @@
       <c-row class="grid">
         <c-col span="24">
           <h1>
-            You will get
+            Exchange
+            <a :href="etherscanTokenLink(current.order.to, current.wallet)" target="_blank">
+              {{ current.spendAmount }} {{ current.order.toSymbol }}
+            </a>
+            to
             <a :href="etherscanTokenLink(current.order.from, current.wallet)" target="_blank">
               {{ currentHumanAmount }} {{ current.order.fromSymbol }}
             </a>
             <br/>
-            to
+            transferred to
             <a :href="etherscanAccountLink(current.wallet)" target="_blank">
               {{ current.wallet }}
             </a>
@@ -181,6 +185,8 @@ export default {
           this.$nextTick(async () => {
             this.current.amount = this.current.order.remaining.toString();
           });
+        } else {
+          this.updateCurrentSpendAmount();
         }
       }
     }, '500ms'),
@@ -204,12 +210,27 @@ export default {
       this.current = {
         order,
         amount: order.remaining,
+        spendAmount: 0,
         wallet: this.wallet,
       };
+      this.updateCurrentSpendAmount();
     },
 
     resetCurrent() {
       this.current = null;
+    },
+
+    async updateCurrentSpendAmount() {
+      if (!this.current) {
+        return;
+      }
+
+      const { order, amount } = this.current;
+      const { Marketplace } = this.blockchain;
+      const marketplace = await Marketplace.deployed();
+
+      const spendAmount = await marketplace.orderPayoffAmount.call(order.id, amount);
+      this.current.spendAmount = this.humanValue(spendAmount, order.toDecimals, null);
     },
 
     async exchange() {
@@ -226,20 +247,22 @@ export default {
       const marketplace = await Marketplace.deployed();
       const token = await Token.at(order.to);
 
-      // @todo: Figure out a way to check allowance for desired order only
-      // this might use allowance set for other trades, thus breaking that ones...
       try {
-        const [ payoffAmount/*, allowance*/ ] = await Promise.all([
+        const [ payoffAmount, allowance ] = await Promise.all([
           marketplace.orderPayoffAmount.call(order.id, amount),
-          //token.allowance.call(this.wallet, Marketplace.address),
+          token.allowance.call(this.wallet, Marketplace.address),
         ]);
-        const humanPayoffAmount = this.humanValue(payoffAmount.toString(), order.toDecimals, null);
+        const requiredAllowance = await marketplace.requiredUserTokenAllowance.call(
+          this.wallet,
+          token.address,
+          payoffAmount
+        );
+        const requiredAllowanceHuman = this.humanValue(requiredAllowance, order.toDecimals, null);
 
-        //if (!this.toBN(allowance).gte(this.toBN(payoffAmount))) {
-          await token.increaseAllowance(Marketplace.address, payoffAmount, { from: this.wallet });
-          // await this.awaitTxConfirmation(tx);
-          this.notify(`[Order#${ order.id }] Allowance of ${ humanPayoffAmount } ${ order.toSymbol } confirmed.`);
-        //}
+        if (!this.toBN(allowance).gte(this.toBN(requiredAllowance))) {
+          await token.approve(Marketplace.address, requiredAllowance, { from: this.wallet });
+          this.notify(`[Order#${ order.id }] Allowance of ${ requiredAllowanceHuman } ${ order.toSymbol } confirmed.`);
+        }
         
         await marketplace.claimOrder(
           order.id,

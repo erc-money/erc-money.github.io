@@ -153,8 +153,24 @@ contract Marketplace is Ownable, Pausable {
     return ordersStats[status];
   }
 
+  function requiredUserTokenAllowance(address user, IToken from, uint additionalAmount) public view
+  returns (uint allowance) {
+    for (uint i = 0; i < userActiveOrders[user].length; i++) {
+      uint orderId = userActiveOrders[user][i]; 
+      IOrder.Order memory order = orders[orderId];
+
+      if (address(order.from) != address(from)) {
+        continue;
+      }
+
+      allowance += order.fromAmount - order.completedAmount;
+    }
+
+    return allowance + additionalAmount;
+  }
+
   function listActiveUserOrders(address user) public view
-  returns (IOrder.Order[] memory userOrders){
+  returns (IOrder.Order[] memory userOrders) {
     uint count = userActiveOrders[user].length;
     userOrders = new IOrder.Order[](count);
 
@@ -220,7 +236,7 @@ contract Marketplace is Ownable, Pausable {
     require(bytes(fromSymbol).length > 0 && fromDecimals > 0, "Token 'from' is not a valid ERC20 token");
     require(bytes(toSymbol).length > 0 && toDecimals> 0, "Token 'to' is not a valid ERC20 token");
     require(
-      from.allowance(_msgSender(), address(this)) >= fromAmount,
+      from.allowance(_msgSender(), address(this)) >= requiredUserTokenAllowance(_msgSender(), from, fromAmount),
       "Marketplace not allowed to spend desired amount of tokens"
     );
 

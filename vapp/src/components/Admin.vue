@@ -242,10 +242,6 @@ export default {
   font-size: 1.2em;
 }
 
-.c-col-wrapper > label.vue-js-switch {
-  margin-top: 0.7em;
-}
-
 .c-col-wrapper > div.token-details {
   color: #5D354D;
   font-size: 1.2em;

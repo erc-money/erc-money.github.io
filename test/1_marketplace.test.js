@@ -33,7 +33,7 @@ contract('Marketplace', function (accounts) {
     this.tokenA = await TokenA.new();
     this.tokenB = await TokenB.new();
 
-    this.lastOrderId = new BN('0');
+    this.lastOrderId = ZERO;
 
     this.createRandomTrade = async () => {
       return this.marketplace.createOrder(
@@ -118,6 +118,14 @@ contract('Marketplace', function (accounts) {
   });
 
   it('should create an order properly', async function () {
+    // validate required pre-allowance
+    const userRequiredPreAllowance = await this.marketplace.requiredUserTokenAllowance(
+      trader1,
+      this.tokenA.address,
+      0
+    );
+    expect(userRequiredPreAllowance.toString()).to.be.equal(ZERO.toString());
+
     const { receipt, orderId } = await this.createTrade({ from: trader1 });
     expectEvent(
       receipt,
@@ -142,6 +150,14 @@ contract('Marketplace', function (accounts) {
     expect(to).to.be.equal(this.tokenB.address);
     expect(fromAmount).to.be.equal(TRADE_FROM_AMOUNT.toString());
     expect(toAmount).to.be.equal(TRADE_TO_AMOUNT.toString());
+
+    // validate required post-allowance
+    const userRequiredAllowance = await this.marketplace.requiredUserTokenAllowance(
+      trader1,
+      this.tokenA.address,
+      0
+    );
+    expect(userRequiredAllowance.toString()).to.be.equal(TRADE_FROM_AMOUNT.toString());
 
     // validate getters
     expect((await this.marketplace.lastOrderId()).toString()).to.be.equal(orderId.toString());
@@ -246,7 +262,7 @@ contract('Marketplace', function (accounts) {
     await expectRevert(
       this.marketplace.createOrder(
         this.tokenA.address,
-        '0',
+        ZERO.toString(),
         this.tokenB.address,
         TRADE_TO_AMOUNT,
         true,

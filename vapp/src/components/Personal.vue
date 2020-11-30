@@ -4,6 +4,7 @@
       <h1 v-if="personalOrders.length > 0">Create an Order.</h1>
       <h1 v-else>Create your first Order.</h1>
 
+      <!-- FROM -->
       <c-row class="grid">
         <c-col span="10">
           <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="fromToken"></c-input>
@@ -21,6 +22,8 @@
           </div>
         </c-col>
       </c-row>
+
+      <!-- TO -->
       <c-row class="grid">
         <c-col span="10">
           <c-input placeholder="Token Address" v-mask="inputMask('addr')" v-model="toToken"></c-input>
@@ -38,8 +41,20 @@
           </div>
         </c-col>
       </c-row>
+
+      <!-- ACTIONS -->
       <c-row class="grid">
-        <c-col span="24" class="create-actions">
+        <c-col span="12" class="create-actions left">
+          <toggle-button
+            :width="150"
+            :height="30"
+            :color="{ checked: '#FCDA06', unchecked: '#5D354D' }"
+            :labels="{ checked: 'Max. Allowance', unchecked: 'Exact Allowance' }"
+            :value="maxAllowance"
+            @change="switchAllowance"
+            :sync="true"/>
+        </c-col>
+        <c-col span="12" class="create-actions">
           <c-button icon="smile-fill" v-on:click="create(true)" :loading="creating" :disabled="!createValid">Partial</c-button>
           <c-button icon="cry-fill" icon-position="right" v-on:click="create(false)" :loading="creating" :disabled="!createValid">Integral</c-button>
         </c-col>
@@ -120,6 +135,7 @@ export default {
       toSymbol: '',
       toDecimals: '',
       toAmount: '0',
+      maxAllowance: false,
       creating: false,
     }
   },
@@ -189,6 +205,16 @@ export default {
   },
 
   methods: {
+    switchAllowance() {
+      this.maxAllowance = !this.maxAllowance;
+      this.notify(
+        this.maxAllowance
+          ? 'Allow spending your whole token balance. '
+            + 'Useful to optimize gas costs for recurrent trades with the same token.'
+          : 'Set allowance to match exactly your order amount.'
+      );
+    },
+
     async fetchTokenInfo(address, prop) {
       if (!this.isAddress(address)) {
         return;
@@ -235,19 +261,30 @@ export default {
       const marketplace = await Marketplace.deployed();
       const token = await Token.at(this.fromAddress);
 
-      // @todo: Figure out a way to check allowance for desired order only
-      // this might use allowance set for other trades, thus breaking that ones...
       try {
-        // const [ allowance ] = await Promise.all([
-        //   token.allowance.call(this.wallet, Marketplace.address),
-        // ]);
+        if (this.maxAllowance) {
+          const balance = await token.balanceOf.call(this.wallet);
+          const balanceHuman = this.humanValue(balance, this.fromDecimals, null);
 
-        //if (!this.toBN(allowance).gte(this.toBN(this.fromAmount))) {
-          await token.increaseAllowance(Marketplace.address, this.fromAmount, { from: this.wallet });
-          // await this.awaitTxConfirmation(tx);
-          this.notify(`Allowance of ${ this.createFromHumanAmount } ${ this.fromSymbol } confirmed.`);
-        //}
-        
+          await token.approve(Marketplace.address, balance, { from: this.wallet });
+          this.notify(`Maximal allowance of ${ balanceHuman } ${ this.fromSymbol } confirmed.`);
+        } else {
+          const [ requiredAllowance, allowance ] = await Promise.all([
+            marketplace.requiredUserTokenAllowance.call(
+              this.wallet,
+              this.fromAddress,
+              this.fromAmount
+            ),
+            token.allowance.call(this.wallet, Marketplace.address),
+          ]);
+          const requiredAllowanceHuman = this.humanValue(requiredAllowance, this.fromDecimals, null);
+
+          if (!this.toBN(allowance).gte(this.toBN(requiredAllowance))) {
+            await token.approve(Marketplace.address, requiredAllowance, { from: this.wallet });
+            this.notify(`Allowance of ${ requiredAllowanceHuman } ${ this.fromSymbol } confirmed.`);
+          }
+        }
+
         const { logs: [ { args: { orderId } } ] } = await marketplace.createOrder(
           this.fromAddress,
           this.fromAmount,
@@ -370,6 +407,10 @@ export default {
   align-items: center;
   margin-top: 10px;
   margin-bottom: 20px;
+}
+
+.create-actions.left {
+  justify-content: flex-start;
 }
 
 .c-col-wrapper > .c-button-group {
