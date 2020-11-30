@@ -1,7 +1,6 @@
 const {
   BN,
   ether,
-  constants,
   expectEvent,
   expectRevert,
 } = require('@openzeppelin/test-helpers');
@@ -255,8 +254,10 @@ contract('Marketplace', function (accounts) {
   });
 
   it('should deny creating an order with an amount grater than the user holds', async function () {
-    const doubleBalance = TRADERS_BALANCE.mul(new BN('2')).toString();
-    await expectRevert(this.createTrade({ from: trader4, fromAmount: doubleBalance }), "User does not hold the desired amount of tokens");
+    await expectRevert(
+      this.createTrade({ from: trader4, fromAmount: TRADERS_BALANCE.mul(TWO).toString() }),
+      "User does not hold the desired amount of tokens"
+    );
   });
 
   it('should deny creating an order without setting allowance', async function () {
@@ -532,5 +533,36 @@ contract('Marketplace', function (accounts) {
 
     expect(await web3.eth.getBalance(treasury))
       .to.be.equal(new BN(initialBalance).add(TWO).toString());
+  });
+
+  it('should allow updating order reward', async function () {
+    await this.tokenA.grantRole(MINTER_ROLE, this.marketplace.address);
+    expectEvent(
+      await this.marketplace.updateReward(
+        this.tokenA.address,
+        DEFAULT_REWARD.mul(TWO).toString(),
+        { from: owner }
+      ),
+      'RewardUpdated',
+      {
+        token: this.tokenA.address,
+        reward: DEFAULT_REWARD.mul(TWO).toString(),
+        who: owner,
+      }
+    );
+    expect(await this.marketplace.token()).to.be.equal(this.tokenA.address);
+    expect((await this.marketplace.reward()).toString()).to.be.equal(DEFAULT_REWARD.mul(TWO).toString());
+  });
+
+  it('should allow updating treasury wallet', async function () {
+    expectEvent(
+      await this.marketplace.updateTreasury(owner, { from: owner }),
+      'TreasuryUpdated',
+      {
+        treasury: owner,
+        who: owner,
+      }
+    );
+    expect(await this.marketplace.treasury()).to.be.equal(owner);
   });
 });

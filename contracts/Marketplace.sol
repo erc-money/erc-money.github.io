@@ -17,7 +17,7 @@ contract Marketplace is Ownable, Pausable {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
   // @dev treasury wallet to forward donated eth to
-  address payable public immutable treasury;
+  address payable public treasury;
 
   // @dev reward token
   IToken public token;
@@ -65,9 +65,14 @@ contract Marketplace is Ownable, Pausable {
   event UnblacklistedToken(IToken token, address who);
 
   /**
-   * @dev Emitted when reward `token` and a `reward` amount apecified by `who`.
+   * @dev Emitted when reward `token` and a `reward` amount updated by `who`.
    */
   event RewardUpdated(IToken token, uint reward, address who);
+
+  /**
+   * @dev Emitted when `treasury` wallet updated by `who`.
+   */
+  event TreasuryUpdated(address payable treasury, address who);
 
   /**
    * @dev Emitted when `receiver` rewarded with `reward` amount of tokens.
@@ -122,10 +127,9 @@ contract Marketplace is Ownable, Pausable {
     address _owner,
     address payable _treasury
   ) public {
-    require(_treasury != address(0), "Invalid treasury wallet address");
     require(_owner != address(0), "Invalid owner address");
 
-    treasury = _treasury;
+    updateTreasury(_treasury);
     transferOwnership(_owner);
   }
 
@@ -307,6 +311,17 @@ contract Marketplace is Ownable, Pausable {
     _reward(_msgSender());
 
     return true;
+  }
+
+  /**
+   * @dev Update treasury address
+   */
+  function updateTreasury(address payable _treasury) public onlyOwner {
+    require(_treasury != address(0), "Invalid treasury wallet address");
+
+    treasury = _treasury;
+
+    emit TreasuryUpdated(_treasury, _msgSender());
   }
 
   /**
