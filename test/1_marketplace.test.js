@@ -24,7 +24,7 @@ contract('Marketplace', function (accounts) {
   const ONE = new BN('1');
   const TWO = new BN('2');
   const THREE = new BN('3');
-  const [ owner, treasury, trader1, trader2, trader3 ] = accounts;
+  const [ owner, treasury, trader1, trader2, trader3, trader4 ] = accounts;
   const { MINTER_ROLE } = utilsFunctor();
 
   before(async function () {
@@ -103,7 +103,7 @@ contract('Marketplace', function (accounts) {
       );
     };
 
-    await Promise.all([ trader1, trader2, trader3 ].map(trader => {
+    await Promise.all([ trader1, trader2, trader3, trader4 ].map(trader => {
       return Promise.all([ this.tokenA, this.tokenB ]
         .map(token => token.mint(trader, TRADERS_BALANCE)))
     }));
@@ -254,8 +254,13 @@ contract('Marketplace', function (accounts) {
     );
   });
 
+  it('should deny creating an order with an amount grater than the user holds', async function () {
+    const doubleBalance = TRADERS_BALANCE.mul(new BN('2')).toString();
+    await expectRevert(this.createTrade({ from: trader4, fromAmount: doubleBalance }), "User does not hold the desired amount of tokens");
+  });
+
   it('should deny creating an order without setting allowance', async function () {
-    await expectRevert(this.createRandomTrade(), "Marketplace not allowed to spend desired amount of tokens");
+    await expectRevert(this.createRandomTrade(), "Marketplace not allowed to spend the desired amount of tokens");
   });
 
   it('should deny creating invalid orders', async function () {

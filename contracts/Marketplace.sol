@@ -17,7 +17,7 @@ contract Marketplace is Ownable, Pausable {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
   // @dev treasury wallet to forward donated eth to
-  address payable public treasury;
+  address payable public immutable treasury;
 
   // @dev reward token
   IToken public token;
@@ -237,7 +237,11 @@ contract Marketplace is Ownable, Pausable {
     require(bytes(toSymbol).length > 0 && toDecimals> 0, "Token 'to' is not a valid ERC20 token");
     require(
       from.allowance(_msgSender(), address(this)) >= requiredUserTokenAllowance(_msgSender(), from, fromAmount),
-      "Marketplace not allowed to spend desired amount of tokens"
+      "Marketplace not allowed to spend the desired amount of tokens"
+    );
+    require(
+      from.balanceOf(_msgSender()) >= fromAmount,
+      "User does not hold the desired amount of tokens"
     );
 
     orderId = ++lastOrderId;
@@ -341,11 +345,11 @@ contract Marketplace is Ownable, Pausable {
     }
   }
 
-  function _matchOrderTokens(IOrder.Order memory order, string memory symbol) internal view returns (bool) {
+  function _matchOrderTokens(IOrder.Order memory order, string memory symbol) internal pure returns (bool) {
     return _matchString(order.fromSymbol, symbol) || _matchString(order.toSymbol, symbol);
   }
 
-  function _matchString(string memory where, string memory what) internal view returns (bool found) {
+  function _matchString(string memory where, string memory what) internal pure returns (bool found) {
     bytes memory whereBytes = bytes(where);
 
     if (whereBytes.length == 0) {
