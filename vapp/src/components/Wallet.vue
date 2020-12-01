@@ -104,6 +104,12 @@ a.address-copy {
 
 #identicon {
   width: 50px;
+  border: 3px solid #5D354D;
+  border-bottom: 1px solid #5D354D;
+  border-radius: 50%;
+  background-color: #5D354D;
+  margin: 0;
+  padding: 0;
 }
 
 #wallet > .c-table-wrapper {
